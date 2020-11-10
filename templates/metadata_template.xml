@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BatchFileInterfaceMetadata xmlns="http://www.hmrc.gsi.gov.uk/mdg/batchFileInterfaceMetadataSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdg/batchFileInterfaceMetadataSchema schema.xsd">
+	<sourceSystem>DIT</sourceSystem>
+	<interfaceName>TAQ01</interfaceName>
+	<interfaceVersion>V1.0</interfaceVersion>
+	<correlationID>{CORRELATION_ID}</correlationID>
+	<checksum>{CHECKSUM}</checksum>
+	<checksumAlgorithm>MD5</checksumAlgorithm>
+	<fileSize>{FILESIZE}</fileSize>
+	<compressed>false</compressed>
+	<sourceLocation>DIT FTP Server</sourceLocation>
+	<sourceFileName>{SOURCE_FILE_NAME}</sourceFileName>
+</BatchFileInterfaceMetadata>
