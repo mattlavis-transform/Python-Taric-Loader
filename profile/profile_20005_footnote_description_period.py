@@ -4,12 +4,12 @@ import common.globals as g
 class profile_20005_footnote_description_period(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        footnote_description_period_sid = app.get_number_value(omsg, ".//oub:footnote.description.period.sid", True)
-        footnote_type_id = app.get_value(omsg, ".//oub:footnote.type.id", True)
-        footnote_id = app.get_value(omsg, ".//oub:footnote.id", True)
+        operation_date = g.app.get_timestamp()
+        footnote_description_period_sid = g.app.get_number_value(omsg, ".//oub:footnote.description.period.sid", True)
+        footnote_type_id = g.app.get_value(omsg, ".//oub:footnote.type.id", True)
+        footnote_id = g.app.get_value(omsg, ".//oub:footnote.id", True)
         code = footnote_type_id + footnote_id
-        validity_start_date = app.get_date_value(omsg, ".//oub:validity.start.date", True)
+        validity_start_date = g.app.get_date_value(omsg, ".//oub:validity.start.date", True)
 
         footnote_types = g.app.get_footnote_types()
         if footnote_description_period_sid < 0:
@@ -23,16 +23,16 @@ class profile_20005_footnote_description_period(object):
         # Perform business rule validation
         if g.app.perform_taric_validation is True:
             if footnote_type_id not in footnote_types:
-                g.app.record_business_rule_violation("FO1", "The referenced footnote type must exist.", operation, transaction_id, message_id, record_code, sub_record_code, code)
+                g.data_file.record_business_rule_violation("FO1", "The referenced footnote type must exist.", operation, transaction_id, message_id, record_code, sub_record_code, code)
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO footnote_description_periods_oplog (footnote_description_period_sid,
             footnote_type_id, footnote_id, validity_start_date, operation, operation_date, national)
             VALUES (%s, %s, %s, %s, %s, %s, %s)""",
             (footnote_description_period_sid, footnote_type_id, footnote_id, validity_start_date, operation, operation_date, national))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, code)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, code)
         cur.close()

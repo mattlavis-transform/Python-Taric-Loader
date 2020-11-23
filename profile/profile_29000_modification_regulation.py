@@ -6,25 +6,25 @@ from datetime import datetime
 class profile_29000_modification_regulation(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        modification_regulation_role = app.get_value(omsg, ".//oub:modification.regulation.role", True)
-        modification_regulation_id = app.get_value(omsg, ".//oub:modification.regulation.id", True)
-        published_date = app.get_date_value(omsg, ".//oub:published.date", True)
-        officialjournal_number = app.get_value(omsg, ".//oub:officialjournal.number", True)
-        officialjournal_page = app.get_value(omsg, ".//oub:officialjournal.page", True)
-        validity_start_date = app.get_date_value(omsg, ".//oub:validity.start.date", True)
-        validity_end_date = app.get_date_value(omsg, ".//oub:validity.end.date", True)
-        effective_end_date = app.get_date_value(omsg, ".//oub:effective.end.date", True)
-        base_regulation_role = app.get_value(omsg, ".//oub:base.regulation.role", True)
-        base_regulation_id = app.get_value(omsg, ".//oub:base.regulation.id", True)
-        complete_abrogation_regulation_role = app.get_value(omsg, ".//oub:complete.abrogation.regulation.role", True)
-        complete_abrogation_regulation_id = app.get_value(omsg, ".//oub:complete.abrogation.regulation.id", True)
-        explicit_abrogation_regulation_role = app.get_value(omsg, ".//oub:explicit.abrogation.regulation.role", True)
-        explicit_abrogation_regulation_id = app.get_value(omsg, ".//oub:explicit.abrogation.regulation.id", True)
-        replacement_indicator = app.get_value(omsg, ".//oub:replacement.indicator", True)
-        stopped_flag = app.get_value(omsg, ".//oub:stopped.flag", True)
-        information_text = app.get_value(omsg, ".//oub:information.text", True)
-        approved_flag = app.get_value(omsg, ".//oub:approved.flag", True)
+        operation_date = g.app.get_timestamp()
+        modification_regulation_role = g.app.get_value(omsg, ".//oub:modification.regulation.role", True)
+        modification_regulation_id = g.app.get_value(omsg, ".//oub:modification.regulation.id", True)
+        published_date = g.app.get_date_value(omsg, ".//oub:published.date", True)
+        officialjournal_number = g.app.get_value(omsg, ".//oub:officialjournal.number", True)
+        officialjournal_page = g.app.get_value(omsg, ".//oub:officialjournal.page", True)
+        validity_start_date = g.app.get_date_value(omsg, ".//oub:validity.start.date", True)
+        validity_end_date = g.app.get_date_value(omsg, ".//oub:validity.end.date", True)
+        effective_end_date = g.app.get_date_value(omsg, ".//oub:effective.end.date", True)
+        base_regulation_role = g.app.get_value(omsg, ".//oub:base.regulation.role", True)
+        base_regulation_id = g.app.get_value(omsg, ".//oub:base.regulation.id", True)
+        complete_abrogation_regulation_role = g.app.get_value(omsg, ".//oub:complete.abrogation.regulation.role", True)
+        complete_abrogation_regulation_id = g.app.get_value(omsg, ".//oub:complete.abrogation.regulation.id", True)
+        explicit_abrogation_regulation_role = g.app.get_value(omsg, ".//oub:explicit.abrogation.regulation.role", True)
+        explicit_abrogation_regulation_id = g.app.get_value(omsg, ".//oub:explicit.abrogation.regulation.id", True)
+        replacement_indicator = g.app.get_value(omsg, ".//oub:replacement.indicator", True)
+        stopped_flag = g.app.get_value(omsg, ".//oub:stopped.flag", True)
+        information_text = g.app.get_value(omsg, ".//oub:information.text", True)
+        approved_flag = g.app.get_value(omsg, ".//oub:approved.flag", True)
 
         # Set operation types and print load message to screen
         operation = g.app.get_loading_message(update_type, "modification regulation", modification_regulation_id)
@@ -36,7 +36,7 @@ class profile_29000_modification_regulation(object):
                 # Business rule ROIMM1	The (regulation id + role id) must be unique.
                 for reg in g.app.all_regulations_with_dates:
                     if modification_regulation_id == reg[0] and modification_regulation_role == reg[1]:
-                        g.app.record_business_rule_violation("ROIMM1", "The (regulation id + role id) must be unique.", operation,
+                        g.data_file.record_business_rule_violation("ROIMM1", "The (regulation id + role id) must be unique.", operation,
                         transaction_id, message_id, record_code, sub_record_code, modification_regulation_id)
                         break
 
@@ -59,13 +59,13 @@ class profile_29000_modification_regulation(object):
                             measure_start_date = row[1]
                             measure_end_date = row[2]
                             if measure_end_date > validity_end_date:
-                                g.app.record_business_rule_violation("ROIMM14", "Explicit dates of related measures must be within the "
+                                g.data_file.record_business_rule_violation("ROIMM14", "Explicit dates of related measures must be within the "
                                 "validity period of the modification regulation.", operation, transaction_id, message_id, record_code, sub_record_code, base_regulation_id)
 
                 # ROIMM5	The start date must be less than or equal to the end date if the end date is explicit.
                 if validity_end_date is not None:
                     if validity_end_date < validity_start_date:
-                        g.app.record_business_rule_violation("ROIMM5", "The start date must be less than or equal to the end date if the end date is explicit.", operation, transaction_id, message_id, record_code, sub_record_code, modification_regulation_id)
+                        g.data_file.record_business_rule_violation("ROIMM5", "The start date must be less than or equal to the end date if the end date is explicit.", operation, transaction_id, message_id, record_code, sub_record_code, modification_regulation_id)
 
             if validity_end_date is not None and effective_end_date is not None:
                 if validity_end_date < effective_end_date:
@@ -102,11 +102,11 @@ class profile_29000_modification_regulation(object):
                         for row in rows:
                             offending_measures += str(row[0]) + ", "
 
-                        g.app.record_business_rule_violation("MODx", "Clashing modification regulation", operation, transaction_id, message_id, record_code, sub_record_code, modification_regulation_id + "(" + offending_measures + ")")
+                        g.data_file.record_business_rule_violation("MODx", "Clashing modification regulation", operation, transaction_id, message_id, record_code, sub_record_code, modification_regulation_id + "(" + offending_measures + ")")
             """
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO modification_regulations_oplog (modification_regulation_role,
             modification_regulation_id, published_date, officialjournal_number, officialjournal_page,
@@ -125,9 +125,9 @@ class profile_29000_modification_regulation(object):
             explicit_abrogation_regulation_role, explicit_abrogation_regulation_id,
             replacement_indicator, stopped_flag, information_text, approved_flag,
             operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, modification_regulation_id)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, modification_regulation_id)
         cur.close()
 
         if g.app.perform_taric_validation is True:

@@ -4,18 +4,18 @@ import common.globals as g
 class profile_43010_measure_condition(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        measure_condition_sid = app.get_number_value(omsg, ".//oub:measure.condition.sid", True)
-        measure_sid = app.get_number_value(omsg, ".//oub:measure.sid", True)
-        condition_code = app.get_value(omsg, ".//oub:condition.code", True)
-        component_sequence_number = app.get_value(omsg, ".//oub:component.sequence.number", True)
-        condition_duty_amount = app.get_value(omsg, ".//oub:condition.duty.amount", True)
-        condition_monetary_unit_code = app.get_value(omsg, ".//oub:condition.monetary.unit.code", True)
-        condition_measurement_unit_code = app.get_value(omsg, ".//oub:condition.measurement.unit.code", True)
-        condition_measurement_unit_qualifier_code = app.get_value(omsg, ".//oub:condition.measurement.unit.qualifier.code", True)
-        action_code = app.get_value(omsg, ".//oub:action.code", True)
-        certificate_type_code = app.get_value(omsg, ".//oub:certificate.type.code", True)
-        certificate_code = app.get_value(omsg, ".//oub:certificate.code", True)
+        operation_date = g.app.get_timestamp()
+        measure_condition_sid = g.app.get_number_value(omsg, ".//oub:measure.condition.sid", True)
+        measure_sid = g.app.get_number_value(omsg, ".//oub:measure.sid", True)
+        condition_code = g.app.get_value(omsg, ".//oub:condition.code", True)
+        component_sequence_number = g.app.get_value(omsg, ".//oub:component.sequence.number", True)
+        condition_duty_amount = g.app.get_value(omsg, ".//oub:condition.duty.amount", True)
+        condition_monetary_unit_code = g.app.get_value(omsg, ".//oub:condition.monetary.unit.code", True)
+        condition_measurement_unit_code = g.app.get_value(omsg, ".//oub:condition.measurement.unit.code", True)
+        condition_measurement_unit_qualifier_code = g.app.get_value(omsg, ".//oub:condition.measurement.unit.qualifier.code", True)
+        action_code = g.app.get_value(omsg, ".//oub:action.code", True)
+        certificate_type_code = g.app.get_value(omsg, ".//oub:certificate.type.code", True)
+        certificate_code = g.app.get_value(omsg, ".//oub:certificate.code", True)
         if certificate_type_code is not None:
             code = certificate_type_code + certificate_code
         else:
@@ -36,7 +36,7 @@ class profile_43010_measure_condition(object):
                 cur.execute(sql, params)
                 row = cur.fetchone()
                 if row[0] == 0:
-                    g.app.record_business_rule_violation("DBFK", "Measure must exist (measure condition).", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("DBFK", "Measure must exist (measure condition).", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # You must not be able to insert a new measure condition if that measure condition already exists
             if update_type == "3":
@@ -48,7 +48,7 @@ class profile_43010_measure_condition(object):
                 cur.execute(sql, params)
                 row = cur.fetchone()
                 if row[0] == 1:
-                    g.app.record_business_rule_violation("DBFK", "Measure condition already exists: cannot overwrite.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("DBFK", "Measure condition already exists: cannot overwrite.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
                 # Business rule CE4	If a certificate is used in a measure condition then the validity period of the certificate must span the validity period of the measure.
                 if code is not None:
@@ -71,11 +71,11 @@ class profile_43010_measure_condition(object):
                         certificate_start_date = rows[1][0]
                         certificate_end_date = rows[1][1]
                         if (certificate_start_date > measure_start_date) or (measure_end_date > certificate_end_date):
-                            g.app.record_business_rule_violation("CE4", "If a certificate is used in a measure condition then the validity period of the "
+                            g.data_file.record_business_rule_violation("CE4", "If a certificate is used in a measure condition then the validity period of the "
                             "certificate must span the validity period of the measure.", operation, transaction_id, message_id, record_code, sub_record_code, code)
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO measure_conditions_oplog (measure_condition_sid, measure_sid, condition_code,
             component_sequence_number, condition_duty_amount, condition_monetary_unit_code,
@@ -86,7 +86,7 @@ class profile_43010_measure_condition(object):
             component_sequence_number, condition_duty_amount, condition_monetary_unit_code,
             condition_measurement_unit_code, condition_measurement_unit_qualifier_code, action_code,
             certificate_type_code, certificate_code, operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
         cur.close()

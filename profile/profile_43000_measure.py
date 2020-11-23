@@ -7,29 +7,29 @@ from datetime import datetime
 class profile_43000_measure(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        measure_sid = app.get_number_value(omsg, ".//oub:measure.sid", True)
-        measure_type = app.get_value(omsg, ".//oub:measure.type", True)
-        geographical_area = app.get_value(omsg, ".//oub:geographical.area", True)
-        goods_nomenclature_item_id = app.get_value(omsg, ".//oub:goods.nomenclature.item.id", True)
-        additional_code_type = app.get_value(omsg, ".//oub:additional.code.type", True)
-        additional_code = app.get_value(omsg, ".//oub:additional.code", True)
-        ordernumber = app.get_value(omsg, ".//oub:ordernumber", True)
-        reduction_indicator = app.get_number_value(omsg, ".//oub:reduction.indicator", True)
-        validity_start_date = app.get_date_value(omsg, ".//oub:validity.start.date", True)
-        validity_start_date_string = app.get_value(omsg, ".//oub:validity.start.date", True)
-        measure_generating_regulation_role = app.get_value(omsg, ".//oub:measure.generating.regulation.role", True)
-        measure_generating_regulation_id = app.get_value(omsg, ".//oub:measure.generating.regulation.id", True)
+        operation_date = g.app.get_timestamp()
+        measure_sid = g.app.get_number_value(omsg, ".//oub:measure.sid", True)
+        measure_type = g.app.get_value(omsg, ".//oub:measure.type", True)
+        geographical_area = g.app.get_value(omsg, ".//oub:geographical.area", True)
+        goods_nomenclature_item_id = g.app.get_value(omsg, ".//oub:goods.nomenclature.item.id", True)
+        additional_code_type = g.app.get_value(omsg, ".//oub:additional.code.type", True)
+        additional_code = g.app.get_value(omsg, ".//oub:additional.code", True)
+        ordernumber = g.app.get_value(omsg, ".//oub:ordernumber", True)
+        reduction_indicator = g.app.get_number_value(omsg, ".//oub:reduction.indicator", True)
+        validity_start_date = g.app.get_date_value(omsg, ".//oub:validity.start.date", True)
+        validity_start_date_string = g.app.get_value(omsg, ".//oub:validity.start.date", True)
+        measure_generating_regulation_role = g.app.get_value(omsg, ".//oub:measure.generating.regulation.role", True)
+        measure_generating_regulation_id = g.app.get_value(omsg, ".//oub:measure.generating.regulation.id", True)
         regulation_code = measure_generating_regulation_id
-        validity_end_date = app.get_date_value(omsg, ".//oub:validity.end.date", True)
-        validity_end_date_string = app.get_value(omsg, ".//oub:validity.end.date", True)
-        justification_regulation_role = app.get_value(omsg, ".//oub:justification.regulation.role", True)
-        justification_regulation_id = app.get_value(omsg, ".//oub:justification.regulation.id", True)
-        stopped_flag = app.get_value(omsg, ".//oub:stopped.flag", True)
-        geographical_area_sid = app.get_number_value(omsg, ".//oub:geographical.area.sid", True)
-        goods_nomenclature_sid = app.get_number_value(omsg, ".//oub:goods.nomenclature.sid", True)
-        additional_code_sid = app.get_number_value(omsg, ".//oub:additional.code.sid", True)
-        export_refund_nomenclature_sid = app.get_number_value(omsg, ".//oub:export.refund.nomenclature.sid", True)
+        validity_end_date = g.app.get_date_value(omsg, ".//oub:validity.end.date", True)
+        validity_end_date_string = g.app.get_value(omsg, ".//oub:validity.end.date", True)
+        justification_regulation_role = g.app.get_value(omsg, ".//oub:justification.regulation.role", True)
+        justification_regulation_id = g.app.get_value(omsg, ".//oub:justification.regulation.id", True)
+        stopped_flag = g.app.get_value(omsg, ".//oub:stopped.flag", True)
+        geographical_area_sid = g.app.get_number_value(omsg, ".//oub:geographical.area.sid", True)
+        goods_nomenclature_sid = g.app.get_number_value(omsg, ".//oub:goods.nomenclature.sid", True)
+        additional_code_sid = g.app.get_number_value(omsg, ".//oub:additional.code.sid", True)
+        export_refund_nomenclature_sid = g.app.get_number_value(omsg, ".//oub:export.refund.nomenclature.sid", True)
         if validity_end_date is None:
             validity_end_date2 = datetime.strptime("2999-12-31", "%Y-%m-%d")
         else:
@@ -37,8 +37,9 @@ class profile_43000_measure(object):
 
         # Add to a global list of measures, so that this can be validated at the end that there are
         # components associated with it
-        if measure_type in g.app.measure_types_that_require_components_list:
-            g.app.duty_measure_list.append(measure_sid)
+        if g.app.perform_taric_validation is True:
+            if measure_type in g.app.measure_types_that_require_components_list:
+                g.app.duty_measure_list.append(measure_sid)
 
         # Set operation types and print load message to screen
         operation = g.app.get_loading_message(update_type, "measure", measure_sid)
@@ -57,6 +58,7 @@ class profile_43000_measure(object):
                 cur = g.app.conn.cursor()
                 cur.execute(sql, params)
                 rows = cur.fetchall()
+                match = True
                 for row in rows:
                     goods_nomenclature_start_date = row[2]
                     goods_nomenclature_end_date = row[3]
@@ -67,7 +69,7 @@ class profile_43000_measure(object):
                         break
 
                 if match is False:
-                    g.app.record_business_rule_violation("NIG30", "When a goods nomenclature is used in a goods measure then the validity "
+                    g.data_file.record_business_rule_violation("NIG30", "When a goods nomenclature is used in a goods measure then the validity "
                     "period of the goods nomenclature must span the validity period of the goods measure.", operation,
                     transaction_id, message_id, record_code, sub_record_code, measure_sid)
                     sys.exit()
@@ -87,7 +89,7 @@ class profile_43000_measure(object):
                     geographical_area_start_date = rows[0][0]
                     geographical_area_end_date = rows[0][1]
                     if (validity_start_date < geographical_area_start_date) or (validity_end_date2 > geographical_area_end_date):
-                        g.app.record_business_rule_violation("GA10", "When a geographical area is referenced in a measure then the validity period of "
+                        g.data_file.record_business_rule_violation("GA10", "When a geographical area is referenced in a measure then the validity period of "
                         "the geographical area must span the validity period of the measure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
 
                 # Business rule ACN13
@@ -110,7 +112,7 @@ class profile_43000_measure(object):
                         additional_code_start_date = rows[0][0]
                         additional_code_end_date = rows[0][1]
                         if (additional_code_start_date > validity_start_date) or (validity_end_date2 > additional_code_end_date):
-                            g.app.record_business_rule_violation("ACN13", "When an additional code is used in an additional code nomenclature measure "
+                            g.data_file.record_business_rule_violation("ACN13", "When an additional code is used in an additional code nomenclature measure "
                             "then the validity period of the additional code must span the validity period of the measure.", operation,
                             transaction_id, message_id, record_code, sub_record_code, measure_sid)
 
@@ -125,33 +127,33 @@ class profile_43000_measure(object):
                 cur.execute(sql, params)
                 rows = cur.fetchall()
                 if len(rows) == 0:
-                    g.app.record_business_rule_violation("DBFK", "The measure must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("DBFK", "The measure must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME34 error
             if validity_end_date is not None:
                 if justification_regulation_id is None or justification_regulation_role is None:
-                    g.app.record_business_rule_violation("ME34", "A justification regulation must be entered if the measure end date is filled in.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("ME34", "A justification regulation must be entered if the measure end date is filled in.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME86 error
             if int(measure_generating_regulation_role) > 4:
-                g.app.record_business_rule_violation("ME86", "The role of the entered regulation must be a Base, a Modification, "
+                g.data_file.record_business_rule_violation("ME86", "The role of the entered regulation must be a Base, a Modification, "
                 "a Provisional AntiDumping, a Definitive Anti-Dumping.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME6 / ME7 error
             """
             if (goods_nomenclature_item_id not in g.app.goods_nomenclatures) and (goods_nomenclature_item_id is not None):
-                g.app.record_business_rule_violation("ME6", "The goods code must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                g.data_file.record_business_rule_violation("ME6", "The goods code must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
             """
 
             # Check for ME4 error
             geographical_areas = g.app.get_all_geographical_areas()
             if geographical_area not in geographical_areas:
-                g.app.record_business_rule_violation("ME4", "The geographical area must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                g.data_file.record_business_rule_violation("ME4", "The geographical area must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME2, ME3 and ME10 error
             measure_types = g.app.get_measure_types()
             if measure_type not in measure_types:
-                g.app.record_business_rule_violation("ME2", "The measure type must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                g.data_file.record_business_rule_violation("ME2", "The measure type must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
             else:
                 ME3_Error = False
                 for item in g.app.all_measure_types:
@@ -163,7 +165,7 @@ class profile_43000_measure(object):
                     if measure_type_id2 == measure_type:
                         # first check for ME10 (order_number_capture_code)
                         if (order_number_capture_code == 2 and ordernumber is not None) or (order_number_capture_code == 1 and ordernumber is None):
-                            g.app.record_business_rule_violation("ME10", "The order number must be specified if the 'order number flag' "
+                            g.data_file.record_business_rule_violation("ME10", "The order number must be specified if the 'order number flag' "
                             "(specified in the measure type record) has the value 'mandatory'. If the flag is set "
                             "to 'not permitted' then the field cannot be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                         if validity_end_date is None:
@@ -182,12 +184,12 @@ class profile_43000_measure(object):
                                     ME3_Error = True
                         break
                 if ME3_Error is True:
-                    g.app.record_business_rule_violation("ME3", "The validity period of the measure type must span the validity period of the measure.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("ME3", "The validity period of the measure type must span the validity period of the measure.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME25 error
             if validity_end_date is not None:
                 if validity_end_date < validity_start_date:
-                    g.app.record_business_rule_violation("ME3", "If the measure’s end date is specified (implicitly or explicitly) then "
+                    g.data_file.record_business_rule_violation("ME3", "If the measure’s end date is specified (implicitly or explicitly) then "
                     "the start date of the measure must be less than or equal to the end date.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             if int(update_type) in (3, 1):
@@ -206,7 +208,7 @@ class profile_43000_measure(object):
 
                     if found is False:
                         if ordernumber[0:3] != "094":
-                            g.app.record_business_rule_violation("ME116", "When a quota order number is used in a measure then the "
+                            g.data_file.record_business_rule_violation("ME116", "When a quota order number is used in a measure then the "
                             "validity period of the quota order number must span the validity period of the measure.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                     else:
                         # Business rule ON9
@@ -222,13 +224,13 @@ class profile_43000_measure(object):
                             pass
                             """
                             if validity_start_date > datetime.strptime("2007-12-31", "%Y-%m-%d"):
-                                g.app.record_business_rule_violation("ON9", "When a quota order number is used in a measure, then the validity period " \
+                                g.data_file.record_business_rule_violation("ON9", "When a quota order number is used in a measure, then the validity period " \
                                 "of the quota order number must span the validity period of the measure.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                             """
 
             # run ME24 check - check that there is a supporting regulation
             if regulation_code not in g.app.all_regulations:
-                g.app.record_business_rule_violation("ME24", "The role + regulation id must exist. If no measure start date is specified, it defaults to the regulation start date.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                g.data_file.record_business_rule_violation("ME24", "The role + regulation id must exist. If no measure start date is specified, it defaults to the regulation start date.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Run ROIMB8 check - that dates of measures fall within dates of regulation
             my_regulation = g.app.get_my_regulation(regulation_code)
@@ -240,21 +242,21 @@ class profile_43000_measure(object):
                     # Step 1 - check for when the measure end date is not specified
                     # print("Measure start date", validity_start_date, "Regulation start date", regulation_start_date)
                     if validity_start_date < regulation_start_date:
-                        g.app.record_business_rule_violation("ROIMB8(a)", "Explicit dates of related measures must be within the "
+                        g.data_file.record_business_rule_violation("ROIMB8(a)", "Explicit dates of related measures must be within the "
                         "validity period of the base regulation.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                 else:
                     # Step 2 - check for when the measure end date is specified
                     if regulation_end_date is None:
                         if validity_start_date < regulation_start_date:
                             print(validity_start_date, regulation_start_date, measure_sid)
-                            g.app.record_business_rule_violation("ROIMB8(b)", "Explicit dates of related measures must be within the "
+                            g.data_file.record_business_rule_violation("ROIMB8(b)", "Explicit dates of related measures must be within the "
                             "validity period of the base regulation.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
                     else:
                         pass
                         """
                         if validity_start_date < regulation_start_date or validity_end_date > regulation_end_date:
-                            g.app.record_business_rule_violation("ROIMB8(c)", "Explicit dates of related measures must be within the "
+                            g.data_file.record_business_rule_violation("ROIMB8(c)", "Explicit dates of related measures must be within the "
                             "validity period of the base regulation.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                         """
 
@@ -269,7 +271,7 @@ class profile_43000_measure(object):
                 cur.execute(sql, params)
                 rows = cur.fetchall()
                 if len(rows) > 0:
-                    g.app.record_business_rule_violation("DBFK", "Measure SID already exists", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("DBFK", "Measure SID already exists", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             check_me32 = True
             if check_me32 is True:
@@ -347,7 +349,7 @@ class profile_43000_measure(object):
                         if len(rows) > 0:
                             rw = rows[0]
                             offended_measure_sid = rw[0]
-                            g.app.record_business_rule_violation("ME32", "There may be no overlap in time with other measure occurrences with a goods code "
+                            g.data_file.record_business_rule_violation("ME32", "There may be no overlap in time with other measure occurrences with a goods code "
                             "in the same nomenclature hierarchy which references the same measure type, geo area, order number, additional code and reduction "
                             "indicator. This rule is not applicable for Meursing additional codes.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                             sys.exit()
@@ -363,7 +365,7 @@ class profile_43000_measure(object):
             national = None
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO measures_oplog (measure_sid, measure_type_id, geographical_area_id,
             goods_nomenclature_item_id, additional_code_type_id, additional_code_id,
@@ -380,7 +382,7 @@ class profile_43000_measure(object):
             justification_regulation_role, justification_regulation_id, stopped_flag,
             geographical_area_sid, goods_nomenclature_sid, additional_code_sid,
             export_refund_nomenclature_sid, operation, operation_date, national, tariff_measure_number))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
         cur.close()

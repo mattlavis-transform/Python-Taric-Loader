@@ -5,10 +5,10 @@ import common.globals as g
 class profile_43015_measure_excluded_geographical_area(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        measure_sid = app.get_number_value(omsg, ".//oub:measure.sid", True)
-        excluded_geographical_area = app.get_value(omsg, ".//oub:excluded.geographical.area", True)
-        geographical_area_sid = app.get_number_value(omsg, ".//oub:geographical.area.sid", True)
+        operation_date = g.app.get_timestamp()
+        measure_sid = g.app.get_number_value(omsg, ".//oub:measure.sid", True)
+        excluded_geographical_area = g.app.get_value(omsg, ".//oub:excluded.geographical.area", True)
+        geographical_area_sid = g.app.get_number_value(omsg, ".//oub:geographical.area.sid", True)
 
         # Set operation types and print load message to screen
         operation = g.app.get_loading_message(update_type, "excluded_geographical_area on measure_sid", str(measure_sid) + "/" + excluded_geographical_area)
@@ -31,16 +31,16 @@ class profile_43015_measure_excluded_geographical_area(object):
                     measure_exists = False
 
                 if measure_exists is False:
-                    g.app.record_business_rule_violation("DBFK", "Measure must exist (excluded geographical area).", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("DBFK", "Measure must exist (excluded geographical area).", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO measure_excluded_geographical_areas_oplog (measure_sid,
             excluded_geographical_area, geographical_area_sid, operation, operation_date)
             VALUES (%s, %s, %s, %s, %s)""",
             (measure_sid, excluded_geographical_area, geographical_area_sid, operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
         cur.close()

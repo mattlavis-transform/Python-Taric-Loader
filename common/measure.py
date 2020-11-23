@@ -5,21 +5,21 @@ import os
 class measure(object):
     def __init__(self, app, root):
         self.xml = ""
-        for oTransaction in root.findall('.//oub:measure/../../../../../env:transaction', app.namespaces):
+        for oTransaction in root.findall('.//oub:measure/../../../../../env:transaction', g.app.namespaces):
             update_type = self.get_value(app, oTransaction, ".//oub:record/oub:update.type")
             print(oTransaction.get("id"), update_type)
             validity_start_date = datetime.strptime(self.get_value(app, oTransaction, ".//oub:measure/oub:validity.start.date"), '%Y-%m-%d')
             validity_end_date = self.get_value(app, oTransaction, ".//oub:measure/oub:validity.start.date")
             if validity_end_date != "":
                 validity_end_date = datetime.strptime(validity_end_date, '%Y-%m-%d')
-                if validity_end_date > app.critical_date:
-                    validity_end_date = app.critical_date.strftime('%Y-%m-%d')
+                if validity_end_date > g.app.critical_date:
+                    validity_end_date = g.app.critical_date.strftime('%Y-%m-%d')
                 else:
-                    validity_end_date = app.critical_date.strftime('%Y-%m-%d')
+                    validity_end_date = g.app.critical_date.strftime('%Y-%m-%d')
             else:
                 validity_end_date = validity_end_date.strftime('%Y-%m-%d')
 
-            if (validity_start_date < app.critical_date) or update_type == 2:
+            if (validity_start_date < g.app.critical_date) or update_type == 2:
                 self.transaction_id = oTransaction.get("id")
                 self.add('<env:transaction id="' + self.transaction_id + '">', 1)
                 self.add('<env:app.message id="' + str(app.message_id) + '">', 2)
@@ -55,7 +55,7 @@ class measure(object):
                 self.add("</oub:transmission>", 3)
                 self.add("</env:app.message>", 2)
                 self.add('</env:transaction>', 1)
-                app.message_id += 1
+                g.app.message_id += 1
 
     def add(self, field, indent):
         self.xml += ("  " * indent) + field + "\n"
@@ -77,7 +77,7 @@ class measure(object):
 
     def get_value(self, app, oNode, xpath):
         try:
-            s = oNode.find(xpath, app.namespaces).text
+            s = oNode.find(xpath, g.app.namespaces).text
         except:
             s = ""
         return (s)

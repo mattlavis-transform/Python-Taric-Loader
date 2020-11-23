@@ -5,9 +5,9 @@ import common.globals as g
 class profile_36015_quota_order_number_origin_exclusion(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        quota_order_number_origin_sid = app.get_number_value(omsg, ".//oub:quota.order.number.origin.sid", True)
-        excluded_geographical_area_sid = app.get_number_value(omsg, ".//oub:excluded.geographical.area.sid", True)
+        operation_date = g.app.get_timestamp()
+        quota_order_number_origin_sid = g.app.get_number_value(omsg, ".//oub:quota.order.number.origin.sid", True)
+        excluded_geographical_area_sid = g.app.get_number_value(omsg, ".//oub:excluded.geographical.area.sid", True)
 
         # Set operation types and print load message to screen
         operation = g.app.get_loading_message(update_type, "quota order number origin exclusion", quota_order_number_origin_sid)
@@ -22,7 +22,7 @@ class profile_36015_quota_order_number_origin_exclusion(object):
                     geo_validity_end_date = geographical_area[1]
                     geo_area_code = geographical_area[3]
                     if geo_area_code != "1":
-                        g.app.record_business_rule_violation("ON13", "An exclusion can only be entered if the order number origin is a "
+                        g.data_file.record_business_rule_violation("ON13", "An exclusion can only be entered if the order number origin is a "
                         "geographical area group (area code = 1).", operation, transaction_id, message_id, record_code, sub_record_code, quota_order_number_origin_sid)
 
             # DBFK Check the origin exists
@@ -34,15 +34,15 @@ class profile_36015_quota_order_number_origin_exclusion(object):
             cur.execute(sql, params)
             rows = cur.fetchall()
             if len(rows) == 0:
-                g.app.record_business_rule_violation("DBFK", "The referenced quota order number origin must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(quota_order_number_origin_sid))
+                g.data_file.record_business_rule_violation("DBFK", "The referenced quota order number origin must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(quota_order_number_origin_sid))
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO quota_order_number_origin_exclusions_oplog (quota_order_number_origin_sid, excluded_geographical_area_sid, operation, operation_date)
             VALUES (%s, %s, %s, %s)""",
             (quota_order_number_origin_sid, excluded_geographical_area_sid, operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, quota_order_number_origin_sid)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, quota_order_number_origin_sid)
         cur.close()

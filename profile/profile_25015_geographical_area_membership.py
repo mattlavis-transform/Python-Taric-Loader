@@ -5,11 +5,11 @@ import common.globals as g
 class profile_25015_geographical_area_membership(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        geographical_area_sid = app.get_number_value(omsg, ".//oub:geographical.area.sid", True)
-        geographical_area_group_sid = app.get_number_value(omsg, ".//oub:geographical.area.group.sid", True)
-        validity_start_date = app.get_date_value(omsg, ".//oub:validity.start.date", True)
-        validity_end_date = app.get_date_value(omsg, ".//oub:validity.end.date", True)
+        operation_date = g.app.get_timestamp()
+        geographical_area_sid = g.app.get_number_value(omsg, ".//oub:geographical.area.sid", True)
+        geographical_area_group_sid = g.app.get_number_value(omsg, ".//oub:geographical.area.group.sid", True)
+        validity_start_date = g.app.get_date_value(omsg, ".//oub:validity.start.date", True)
+        validity_end_date = g.app.get_date_value(omsg, ".//oub:validity.end.date", True)
         if validity_end_date is None:
             validity_end_date2 = datetime.strptime("2999-12-31", "%Y-%m-%d")
         else:
@@ -25,17 +25,17 @@ class profile_25015_geographical_area_membership(object):
 
             # Business rule GA12
             if geographical_area_sid not in countries_regions:
-                g.app.record_business_rule_violation("GA12", "The referenced geographical area id (member) must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(geographical_area_sid))
+                g.data_file.record_business_rule_violation("GA12", "The referenced geographical area id (member) must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(geographical_area_sid))
 
             # Business rule GA14
             if geographical_area_group_sid is not None:
                 if geographical_area_group_sid not in geographical_area_groups:
-                    g.app.record_business_rule_violation("GA14", "The referenced geographical area group id must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(geographical_area_group_sid))
+                    g.data_file.record_business_rule_violation("GA14", "The referenced geographical area group id must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(geographical_area_group_sid))
 
             # Business rule GA15 The membership start date must be less than or equal to the membership end date.
             if validity_end_date is not None:
                 if validity_end_date < validity_start_date:
-                    g.app.record_business_rule_violation("GA15", "The membership start date must be less than or equal to the membership end date.", operation, transaction_id, message_id, record_code, sub_record_code, str(geographical_area_sid))
+                    g.data_file.record_business_rule_violation("GA15", "The membership start date must be less than or equal to the membership end date.", operation, transaction_id, message_id, record_code, sub_record_code, str(geographical_area_sid))
 
             if update_type == "3":
                 # Business rule GA16 The validity period of the geographical area group must span all membership periods of its members.
@@ -51,7 +51,7 @@ class profile_25015_geographical_area_membership(object):
                     geographical_area_group_start_date = rows[0][0]
                     geographical_area_group_end_date = rows[0][1]
                     if (validity_start_date < geographical_area_group_start_date) or (validity_end_date2 > geographical_area_group_end_date):
-                        g.app.record_business_rule_violation("GA16", "The validity period of the geographical area group must span "
+                        g.data_file.record_business_rule_violation("GA16", "The validity period of the geographical area group must span "
                         "all membership periods of its members.", operation, transaction_id, message_id, record_code, sub_record_code, geographical_area_sid)
 
                 # Business rule GA18	When a geographical area is more than once member of the same group then there may be no overlap in their membership periods.
@@ -62,7 +62,7 @@ class profile_25015_geographical_area_membership(object):
                         existing_end_date = row[1]
                         # (StartDate1 <= EndDate2) and (StartDate2 <= EndDate1)
                         if (existing_start_date <= validity_end_date2) and (validity_start_date <= existing_end_date):
-                            g.app.record_business_rule_violation("GA18", "When a geographical area is more than once member of the same "
+                            g.data_file.record_business_rule_violation("GA18", "When a geographical area is more than once member of the same "
                             "group then there may be no overlap in their membership periods.", operation, transaction_id, message_id,
                             record_code, sub_record_code, geographical_area_sid)
                             break
@@ -70,14 +70,14 @@ class profile_25015_geographical_area_membership(object):
 
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO geographical_area_memberships_oplog (geographical_area_sid,
             geographical_area_group_sid, validity_start_date, validity_end_date, operation, operation_date)
             VALUES (%s, %s, %s, %s, %s, %s)""",
             (geographical_area_sid,
             geographical_area_group_sid, validity_start_date, validity_end_date, operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, geographical_area_sid)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, geographical_area_sid)
         cur.close()

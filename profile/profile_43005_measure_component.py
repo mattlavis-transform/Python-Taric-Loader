@@ -4,13 +4,13 @@ import common.globals as g
 class profile_43005_measure_component(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        measure_sid = app.get_number_value(omsg, ".//oub:measure.sid", True)
-        duty_expression_id = app.get_value(omsg, ".//oub:duty.expression.id", True)
-        duty_amount = app.get_value(omsg, ".//oub:duty.amount", True)
-        monetary_unit_code = app.get_value(omsg, ".//oub:monetary.unit.code", True)
-        measurement_unit_code = app.get_value(omsg, ".//oub:measurement.unit.code", True)
-        measurement_unit_qualifier_code = app.get_value(omsg, ".//oub:measurement.unit.qualifier.code", True)
+        operation_date = g.app.get_timestamp()
+        measure_sid = g.app.get_number_value(omsg, ".//oub:measure.sid", True)
+        duty_expression_id = g.app.get_value(omsg, ".//oub:duty.expression.id", True)
+        duty_amount = g.app.get_value(omsg, ".//oub:duty.amount", True)
+        monetary_unit_code = g.app.get_value(omsg, ".//oub:monetary.unit.code", True)
+        measurement_unit_code = g.app.get_value(omsg, ".//oub:measurement.unit.code", True)
+        measurement_unit_qualifier_code = g.app.get_value(omsg, ".//oub:measurement.unit.qualifier.code", True)
 
         # Set operation types and print load message to screen
         operation = g.app.get_loading_message(update_type, "measure component on measure_sid", measure_sid)
@@ -28,11 +28,11 @@ class profile_43005_measure_component(object):
                         measurement_matched = True
                         break
                 if measurement_matched is False:
-                    g.app.record_business_rule_violation("ME50", "The combination measurement unit + measurement unit qualifier must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("ME50", "The combination measurement unit + measurement unit qualifier must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME41 error
             if duty_expression_id not in g.app.duty_expressions:
-                g.app.record_business_rule_violation("ME41", "The referenced duty expression must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                g.data_file.record_business_rule_violation("ME41", "The referenced duty expression must exist.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
             # Check for ME45, ME46 and ME47 errors
             if duty_expression_id in g.app.duty_expressions:
@@ -48,31 +48,31 @@ class profile_43005_measure_component(object):
                         # ME45
                         if duty_amount_applicability_code == 1:  # Mandatory
                             if duty_amount is None:
-                                g.app.record_business_rule_violation("ME45(a)", "If the flag 'amount' on duty expression is 'mandatory' then an amount must "
+                                g.data_file.record_business_rule_violation("ME45(a)", "If the flag 'amount' on duty expression is 'mandatory' then an amount must "
                                 "be specified. If the flag is set 'not permitted' then no amount may be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                         elif duty_amount_applicability_code == 2:  # Not permitted
                             if duty_amount is not None:
-                                g.app.record_business_rule_violation("ME45(b)", "If the flag 'amount' on duty expression is 'mandatory' then an amount must "
+                                g.data_file.record_business_rule_violation("ME45(b)", "If the flag 'amount' on duty expression is 'mandatory' then an amount must "
                                 "be specified. If the flag is set 'not permitted' then no amount may be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
                         # ME46
                         if monetary_unit_applicability_code == 1:  # Mandatory
                             if monetary_unit_code is None:
-                                g.app.record_business_rule_violation("ME46(a)", "If the flag 'monetary unit' on duty expression is 'mandatory' then a monetary unit "
+                                g.data_file.record_business_rule_violation("ME46(a)", "If the flag 'monetary unit' on duty expression is 'mandatory' then a monetary unit "
                                 "must be specified. If the flag is set 'not permitted' then no monetary unit may be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                         elif monetary_unit_applicability_code == 2:  # Not permitted
                             if monetary_unit_code is not None:
-                                g.app.record_business_rule_violation("ME46(b)", "If the flag 'monetary unit' on duty expression is 'mandatory' then a monetary unit "
+                                g.data_file.record_business_rule_violation("ME46(b)", "If the flag 'monetary unit' on duty expression is 'mandatory' then a monetary unit "
                                 "must be specified. If the flag is set 'not permitted' then no monetary unit may be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
                         # ME47
                         if measurement_unit_applicability_code == 1:  # Mandatory
                             if measurement_unit_code is None:
-                                g.app.record_business_rule_violation("ME47(a)", "If the flag 'measurement unit' on duty expression is 'mandatory' then a "
+                                g.data_file.record_business_rule_violation("ME47(a)", "If the flag 'measurement unit' on duty expression is 'mandatory' then a "
                                 "measurement unit must be specified. If the flag is set 'not permitted' then no measurement unit may be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                         elif measurement_unit_applicability_code == 2:  # Not permitted
                             if measurement_unit_code is None:
-                                g.app.record_business_rule_violation("ME47(b)", "If the flag 'measurement unit' on duty expression is 'mandatory' then a "
+                                g.data_file.record_business_rule_violation("ME47(b)", "If the flag 'measurement unit' on duty expression is 'mandatory' then a "
                                 "measurement unit must be specified. If the flag is set 'not permitted' then no measurement unit may be entered.", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
                         break
 
@@ -89,10 +89,10 @@ class profile_43005_measure_component(object):
                     measure_exists = False
 
                 if measure_exists is False:
-                    g.app.record_business_rule_violation("DBFK", "Measure must exist (measure component).", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
+                    g.data_file.record_business_rule_violation("DBFK", "Measure must exist (measure component).", operation, transaction_id, message_id, record_code, sub_record_code, str(measure_sid))
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO measure_components_oplog (measure_sid, duty_expression_id, duty_amount,
             monetary_unit_code, measurement_unit_code,
@@ -101,7 +101,7 @@ class profile_43005_measure_component(object):
             (measure_sid, duty_expression_id, duty_amount,
             monetary_unit_code, measurement_unit_code,
             measurement_unit_qualifier_code, operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, measure_sid)
         cur.close()

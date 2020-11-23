@@ -1,34 +1,48 @@
-# Taric March end date
-This application takes EU incremental Taric 3 XML files and converts
-them into UK-ready ones by applying business rules to the various
-objects to stop them applying to the UK after the critical date,
-such that they do not conflict with the UK equivalents.
+# Taric Import
+## Implementation steps
 
-It is **critical** that the **envelope ID** of the original is maintained, as these need to
-follow in sequence and need to start where the master file left off.
+- Create and activate a virtual environment, e.g.
 
-Usage
------
-There are two Python scripts that can be run, as follows:
+  `python3 -m venv venv/`
+  `source venv/bin/activate`
 
-* convert.py - used for converting individual files
-* iterate.py - used for converting multiple files in one go
+- Install necessary Python modules 
 
-### Using convert.py
+  - elementpath==2.0.4
+  - psycopg2==2.8.6
+  - xmlschema==1.3.1
 
-1. Most simply, use **py convert.py filename** where filename refers to an EU XML file in the 
-    *xml_in* folder. This just converts a single EU file into a UK-specific equivalent
-    without attempting to merge any UK-specific content into the file.
+  via `pip3 install -r requirements.txt`
 
-2. To merge additional files into the converted EU file, additional arguments can be specified
-    on convert.py, as follows:
+- Create the PostgreSQL database locally, then run the data load script
 
-  py convert.py filename filename2 filename3 filename4
+  `structure.sql`
 
-  * where filename2 and filename3 are Taric 3 XML files located in the **../migrate-reference-data/xml** folder.
+  e.g. via `psql -U postgres -d tariff_empty -a -f db/structure.sql`
 
-  * Up to 3 additional files can be merged
+## Usage
 
-### Using iterate.py
+Imports full and incremental Taric XML files.
 
-This Python script is used to iterate through multiple files in the **xml_in** folder. It runs **convert.py** multiple times according to what files are in the **xml_in** folder.
+Python 3 application which runs on command line using two parameters:
+
+- Parameter 1 = name of PostgreSQL database into which to import the data
+- Parameter 2 = name of the incremental Taric 3 file to import into the database
+
+By default, all files should be placed in the /import folder relative to the root directory
+
+## Configuration switches
+
+The config.json file in the /config subfolder allows you to make 
+
+`{`
+
+​    `"critical_date": "2020-01-31",`
+
+​    `"debug": 1,`
+
+​    `"perform_taric_validation": 0,`
+
+​    `"show_progress": 1`
+
+`}`

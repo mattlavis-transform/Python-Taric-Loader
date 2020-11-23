@@ -4,12 +4,12 @@ import common.globals as g
 class profile_12000_additional_code_type(object):
     def import_node(self, app, update_type, omsg, transaction_id, message_id, record_code, sub_record_code):
         g.app.message_count += 1
-        operation_date = app.get_timestamp()
-        additional_code_type_id = app.get_value(omsg, ".//oub:additional.code.type.id", True)
-        validity_start_date = app.get_date_value(omsg, ".//oub:validity.start.date", True)
-        validity_end_date = app.get_date_value(omsg, ".//oub:validity.end.date", True)
-        application_code = app.get_value(omsg, ".//oub:application.code", True)
-        meursing_table_plan_id = app.get_value(omsg, ".//oub:meursing.table.plan.id", True)
+        operation_date = g.app.get_timestamp()
+        additional_code_type_id = g.app.get_value(omsg, ".//oub:additional.code.type.id", True)
+        validity_start_date = g.app.get_date_value(omsg, ".//oub:validity.start.date", True)
+        validity_end_date = g.app.get_date_value(omsg, ".//oub:validity.end.date", True)
+        application_code = g.app.get_value(omsg, ".//oub:application.code", True)
+        meursing_table_plan_id = g.app.get_value(omsg, ".//oub:meursing.table.plan.id", True)
 
         # Set operation types and print load message to screen
         operation = g.app.get_loading_message(update_type, "additional code type", additional_code_type_id)
@@ -23,26 +23,26 @@ class profile_12000_additional_code_type(object):
                 # Business rule CT4
                 if validity_end_date is not None:
                     if validity_end_date < validity_start_date:
-                        g.app.record_business_rule_violation("CT4", "The start date must be less than or equal to the end date.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                        g.data_file.record_business_rule_violation("CT4", "The start date must be less than or equal to the end date.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
                 if meursing_table_plan_id is not None:
                     # Business rule CT2
                     if application_code != 3:
-                        g.app.record_business_rule_violation("CT2", "The Meursing table plan can only be entered if the additional code type has as application code 'Meursing table additional code type'.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                        g.data_file.record_business_rule_violation("CT2", "The Meursing table plan can only be entered if the additional code type has as application code 'Meursing table additional code type'.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
                     # Business rule CT3
                     if meursing_table_plan_id not in meursing_table_plans:
-                        g.app.record_business_rule_violation("CT3", "The Meursing table plan must exist.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                        g.data_file.record_business_rule_violation("CT3", "The Meursing table plan must exist.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
             if update_type == "1":  # UPDATE
                 # Business rule DBFK
                 if additional_code_type_id not in additional_code_types:
-                    g.app.record_business_rule_violation("DBFK", "The additional code type must exist.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                    g.data_file.record_business_rule_violation("DBFK", "The additional code type must exist.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
             elif update_type == "3":  # INSERT
                 # Business rule CT1
                 if additional_code_type_id in additional_code_types:
-                    g.app.record_business_rule_violation("CT1", "The additional code type must be unique", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                    g.data_file.record_business_rule_violation("CT1", "The additional code type must be unique", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
             elif update_type == "2":  # DELETE
                 used_non_meursing_additional_code_types = g.app.get_used_non_meursing_additional_code_types()
@@ -51,30 +51,30 @@ class profile_12000_additional_code_type(object):
 
                 # Business rule CT6
                 if additional_code_type_id in used_non_meursing_additional_code_types:
-                    g.app.record_business_rule_violation("CT6", "The additional code type cannot be deleted if it is related with a non-Meursing additional code.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                    g.data_file.record_business_rule_violation("CT6", "The additional code type cannot be deleted if it is related with a non-Meursing additional code.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
                 # Business rule CT7
                 if meursing_table_plan_id is not None:
                     if meursing_table_plan_id in meursing_table_plans:
-                        g.app.record_business_rule_violation("CT7", "The additional code type cannot be deleted if it is related with a Meursing Table plan.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                        g.data_file.record_business_rule_violation("CT7", "The additional code type cannot be deleted if it is related with a Meursing Table plan.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
                 # Business rule CT9
                 if additional_code_type_id in additional_code_types_used_in_erns:
-                    g.app.record_business_rule_violation("CT9", "The additional code type cannot be deleted if it is related with an Export refund code.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                    g.data_file.record_business_rule_violation("CT9", "The additional code type cannot be deleted if it is related with an Export refund code.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
                 # Business rule CT10
                 if additional_code_type_id in additional_code_types_mapped_to_measure_types:
-                    g.app.record_business_rule_violation("CT10", "The additional code type cannot be deleted if it is related with a measure type.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+                    g.data_file.record_business_rule_violation("CT10", "The additional code type cannot be deleted if it is related with a measure type.", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
 
         # Load data
-        cur = app.conn.cursor()
+        cur = g.app.conn.cursor()
         try:
             cur.execute("""INSERT INTO additional_code_types_oplog (additional_code_type_id, validity_start_date,
             validity_end_date, application_code, meursing_table_plan_id, operation, operation_date)
             VALUES (%s, %s, %s, %s, %s, %s, %s)""",
             (additional_code_type_id, validity_start_date,
             validity_end_date, application_code, meursing_table_plan_id, operation, operation_date))
-            app.conn.commit()
+            g.app.conn.commit()
         except:
-            g.app.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
+            g.data_file.record_business_rule_violation("DB", "DB failure", operation, transaction_id, message_id, record_code, sub_record_code, additional_code_type_id)
         cur.close()
