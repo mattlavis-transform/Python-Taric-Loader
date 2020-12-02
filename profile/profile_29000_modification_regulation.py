@@ -84,7 +84,7 @@ class profile_29000_modification_regulation(object):
                 my_end_date_string = my_end_date.strftime("%Y-%m-%d")
 
                 if validity_end_date is not None or effective_end_date is not None:
-                    sql = "select measure_sid from ml.measures_real_end_dates " \
+                    sql = "select measure_sid from utils.measures_real_end_dates " \
                     "where measure_generating_regulation_id = %s and measure_generating_regulation_role = %s' " \
                     "and validity_end_date is not null and validity_end_date > %s order by measure_sid"
 

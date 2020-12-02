@@ -93,7 +93,7 @@ class application(object):
     def get_deleted_goods_nomenclatures(self):
         self.deleted_goods_nomenclatures = []
         sql = """select distinct goods_nomenclature_sid, goods_nomenclature_item_id, productline_suffix
-        from ml.deleted_goods_nomenclatures
+        from utils.deleted_goods_nomenclatures
         order by goods_nomenclature_item_id, productline_suffix"""
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -331,7 +331,7 @@ class application(object):
 
     def register_import_complete(self, xml_file):
         self.import_complete_time = self.get_timestamp()
-        sql = """UPDATE ml.import_files SET import_completed = %s,
+        sql = """UPDATE utils.import_files SET import_completed = %s,
         status = 'Completed' WHERE import_file = %s"""
         params = [
             self.import_complete_time,
@@ -374,7 +374,7 @@ class application(object):
         return (r)
 
     def rollback(self):
-        sql = "select * from ml.clear_data(%s, %s)"
+        sql = "select * from utils.clear_data(%s, %s)"
         params = [
             self.to_nice_time(self.import_start_time),
             self.import_file

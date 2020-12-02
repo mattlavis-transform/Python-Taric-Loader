@@ -798,7 +798,7 @@ class taric_file(object):
 
     def check_already_loaded(self):
         # Check that this file has not already been imported
-        sql = "SELECT import_file FROM ml.import_files WHERE import_file = %s"
+        sql = "SELECT import_file FROM utils.import_files WHERE import_file = %s"
         params = [
             self.import_file
         ]
@@ -813,7 +813,7 @@ class taric_file(object):
     def register_import_start(self, xml_file):
         self.import_start_time = g.app.get_timestamp()
         sql = """
-        INSERT INTO ml.import_files (import_file, import_started, status)
+        INSERT INTO utils.import_files (import_file, import_started, status)
         VALUES  (%s, %s, 'Started')
         """
         params = [

@@ -284,7 +284,7 @@ class profile_43000_measure(object):
                             relation_string += "'" + relation + "', "
                         relation_string = relation_string.strip(", ")
 
-                        sql = "select measure_sid from ml.measures_real_end_dates m \n" \
+                        sql = "select measure_sid from utils.measures_real_end_dates m \n" \
                             "where \n" \
                             "(\n" \
                             "	measure_type_id = '" + measure_type + "' \n"  \
