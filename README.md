@@ -8,8 +8,21 @@
 
 - Install necessary Python modules 
 
+  - autopep8==1.5.4
   - elementpath==2.0.4
+  - et-xmlfile==1.0.1
+  - jdcal==1.4.1
+  - numpy==1.19.4
+  - openpyxl==3.0.5
+  - pandas==1.1.4
   - psycopg2==2.8.6
+  - pycodestyle==2.6.0
+  - python-dateutil==2.8.1
+  - python-dotenv==0.15.0
+  - pytz==2020.4
+  - sh==1.14.1
+  - six==1.15.0
+  - toml==0.10.2
   - xmlschema==1.3.1
 
   via `pip3 install -r requirements.txt`
@@ -33,16 +46,9 @@ By default, all files should be placed in the /import folder relative to the roo
 
 ## Configuration switches
 
-The config.json file in the /config subfolder allows you to make 
-
-`{`
-
-​    `"critical_date": "2020-01-31",`
-
-​    `"debug": 1,`
-
-​    `"perform_taric_validation": 0,`
-
-​    `"show_progress": 1`
-
-`}`
+CRITICAL_DATE=yyyy-mm-dd
+DEBUG=0|1
+PASSWORD=xx
+PERFORM_TARIC_VALIDATION=0|1
+SHOW_PROGRESS=0|1
+PROMPT=0|1

@@ -4,9 +4,8 @@ import sys
 import os
 from os import system, name, path
 import csv
-import re
 import json
-
+from dotenv import load_dotenv
 from datetime import timedelta
 from datetime import datetime
 
@@ -29,10 +28,6 @@ class application(object):
         self.LOG_DIR = os.path.join(self.BASE_DIR, "log")
         self.IMPORT_LOG_DIR = os.path.join(self.LOG_DIR, "import")
         self.ERROR_LOG_DIR = os.path.join(self.LOG_DIR, "errors")
-        self.CONFIG_DIR = os.path.join(self.BASE_DIR, "config")
-        self.CONFIG_FILE = os.path.join(self.CONFIG_DIR, "config.json")
-        self.CONFIG_FILE_LOCAL = os.path.join(
-            self.CONFIG_DIR, "config_convert_and_import_taric_files.json")
 
         self.SCHEMA_DIR = os.path.normpath(os.path.join(self.BASE_DIR, ".."))
         self.SCHEMA_DIR = os.path.join(self.SCHEMA_DIR, "xsd")
@@ -45,6 +40,7 @@ class application(object):
         self.get_vscode_debug_mode()
 
     def num_to_bool(self, num):
+        num = int(num)
         if num == 0:
             return False
         else:
@@ -53,7 +49,7 @@ class application(object):
     def connect(self):
         try:
             self.conn = psycopg2.connect(
-                "dbname=" + self.DBASE + " user=postgres password=" + self.p)
+                "dbname=" + self.DBASE + " user=postgres password=" + self.password)
             self.print_to_terminal(
                 "Connected to database '{0}'".format(self.DBASE), False)
         except:
@@ -74,21 +70,18 @@ class application(object):
             self.duty_expressions = self.get_duty_expressions()
 
     def get_config(self):
-        # Get global config items
-        with open(self.CONFIG_FILE, 'r') as f:
-            my_dict = json.load(f)
+        load_dotenv('.env')
+        self.critical_date = os.getenv('CRITICAL_DATE')
+        self.debug = os.getenv('DEBUG')
+        self.password = os.getenv('PASSWORD')
+        self.perform_taric_validation = self.num_to_bool(os.getenv('PERFORM_TARIC_VALIDATION'))
+        self.show_progress = self.num_to_bool(os.getenv('SHOW_PROGRESS'))
+        self.prompt = self.num_to_bool(os.getenv('PROMPT'))
 
-        critical_date = my_dict['critical_date']
-        self.critical_date = datetime.strptime(critical_date, '%Y-%m-%d')
+        self.critical_date = datetime.strptime(self.critical_date, '%Y-%m-%d')
         self.critical_date_plus_one = self.critical_date + timedelta(days=1)
         self.critical_date_plus_one_string = datetime.strftime(
             self.critical_date_plus_one, '%Y-%m-%d')
-
-        self.p = my_dict['p']
-
-        self.perform_taric_validation = self.num_to_bool(
-            my_dict['perform_taric_validation'])
-        self.show_progress = self.num_to_bool(my_dict['show_progress'])
 
     def get_deleted_goods_nomenclatures(self):
         self.deleted_goods_nomenclatures = []
@@ -154,7 +147,7 @@ class application(object):
         return index
 
     def print_to_terminal(self, s, include_indent=True):
-        if self.show_progress:
+        if self.show_progress or include_indent is True:
             if include_indent:
                 s = "- " + s
             else:
@@ -296,7 +289,8 @@ class application(object):
             rows = cur.fetchall()
             if len(rows) > 0:
                 for rw in rows:
-                    self.measure_types_that_require_components_list.append(rw[0])
+                    self.measure_types_that_require_components_list.append(
+                        rw[0])
 
     def get_vscode_debug_mode(self):
         ret = sys.gettrace()

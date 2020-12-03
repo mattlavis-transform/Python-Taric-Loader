@@ -120,9 +120,10 @@ class taric_file(object):
         g.app.print_to_terminal(
             "Preparing to import file " + self.import_file + " into database " + g.app.DBASE, False)
 
-        ret = g.app.yes_or_no("Do you want to continue?")
-        if not (ret) or ret in ("n", "N", "No"):
-            sys.exit()
+        if g.app.prompt:
+            ret = g.app.yes_or_no("Do you want to continue?")
+            if not (ret) or ret in ("n", "N", "No"):
+                sys.exit()
 
         g.app.load_data_sets_for_validation()
         self.check_already_loaded()
@@ -806,8 +807,7 @@ class taric_file(object):
         cur.execute(sql, params)
         rows = cur.fetchall()
         if len(rows) > 0:
-            g.app.print_to_terminal("File " + self.import_file +
-                                    " has already been imported - Aborting now\n", False)
+            g.app.print_to_terminal("File " + self.import_file + " has already been imported - Aborting now\n", False)
             sys.exit()
 
     def register_import_start(self, xml_file):
@@ -867,7 +867,6 @@ class taric_file(object):
                                                         "no measure component or measure condition component must exist. Measure components and measure condition components are "
                                                         "mutually exclusive. A measure can have either components or condition components (if the ‘duty expression’ flag "
                                                         "is ‘mandatory' or 'optional') but not both.'", "", "", "", "430", "00", measure_sid)
-
 
     def rule_FO04(self):
         print("Running business rule FO4 - Footnote description period must exist at the start of the footnote.")
@@ -999,4 +998,3 @@ class taric_file(object):
             measure_sid = item[0]
             self.record_business_rule_violation(
                 "ME43", "The same duty expression can only be used once with the same measure.", "", "", "", "430", "05", measure_sid)
-
