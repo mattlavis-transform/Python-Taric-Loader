@@ -1,13 +1,14 @@
 # Import custom libraries
 import sys
 import common.globals as g
-from common.taric_file import taric_file
+from common.taric_file import TaricFile
+
 
 # Get database into which to import from 1st argument
 if __name__ == "__main__":
     # First argument is the database into which to import the data
     if len(sys.argv) > 1:
-        dbase = sys.argv[1]
+        g.app.DBASE = sys.argv[1]
     else:
         print("Define the database into which to import the Taric XML")
         sys.exit()
@@ -17,13 +18,6 @@ if __name__ == "__main__":
         print("Identify which Taric XML file to load")
         sys.exit()
     else:
-        g.data_file = taric_file(sys.argv[2])
-        filename = sys.argv[2]
-
-        # Connect to the database
-        g.app.DBASE = dbase
-        g.app.get_config()
+        g.data_file = TaricFile(sys.argv[2])
         g.app.connect()
-
-        # Import the file
         g.data_file.import_xml()

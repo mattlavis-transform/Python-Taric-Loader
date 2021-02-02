@@ -19,7 +19,7 @@ class profile_20010_footnote_description(object):
             national = None
 
         # Set operation types and print load message to screen
-        operation = g.app.get_loading_message(update_type, "footnote description", footnote_description_period_sid)
+        operation = g.app.get_loading_message(update_type, "footnote description", str(footnote_description_period_sid) + " (" + description + ")")
 
         # Perform business rule validation
         if g.app.perform_taric_validation is True:

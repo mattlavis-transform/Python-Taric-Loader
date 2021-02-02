@@ -1,30 +1,30 @@
-from re import T
 import psycopg2
 import sys
 import os
 from os import system, name, path
 import csv
-import json
 from dotenv import load_dotenv
-from datetime import timedelta
 from datetime import datetime
 
 from common.log import log
-from common.regulation import regulation
-from common.classification import classification
-from common.taric_file import taric_file
-from common.bcolors import bcolors
+from common.database import Database
+from common.classification import Classification
+from common.taric_file import TaricFile
 
 
 class application(object):
     def __init__(self):
         self.clear()
+        load_dotenv('.env')
+        self.debug = os.getenv('DEBUG')
+        self.password = os.getenv('PASSWORD')
+        self.perform_taric_validation = self.num_to_bool(os.getenv('PERFORM_TARIC_VALIDATION'))
+        self.show_progress = self.num_to_bool(os.getenv('SHOW_PROGRESS'))
+        self.prompt = self.num_to_bool(os.getenv('PROMPT'))
+        self.IMPORT_FOLDER = os.getenv('IMPORT_FOLDER')
         self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         self.BASE_DIR = os.path.normpath(os.path.join(self.BASE_DIR, ".."))
         self.CSV_DIR = os.path.join(self.BASE_DIR, "csv")
-        self.IMPORT_DIR = os.path.join(self.BASE_DIR, "import")
-        self.TEMP_DIR = os.path.join(self.BASE_DIR, "temp")
-        self.TEMP_FILE = os.path.join(self.TEMP_DIR, "temp.xml")
         self.LOG_DIR = os.path.join(self.BASE_DIR, "log")
         self.IMPORT_LOG_DIR = os.path.join(self.LOG_DIR, "import")
         self.ERROR_LOG_DIR = os.path.join(self.LOG_DIR, "errors")
@@ -32,12 +32,27 @@ class application(object):
         self.SCHEMA_DIR = os.path.normpath(os.path.join(self.BASE_DIR, ".."))
         self.SCHEMA_DIR = os.path.join(self.SCHEMA_DIR, "xsd")
 
+        self.DBASE = None
+        self.EU_DATABASES = os.getenv('EU_DATABASES').split(",")
+        self.UK_DATABASES = os.getenv('UK_DATABASES').split(",")
+
         self.namespaces = {'oub': 'urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0',
                            'env': 'urn:publicid:-:DGTAXUD:GENERAL:ENVELOPE:1.0', }  # add more as needed
         self.message_id = 1
         self.message_count = 0
         self.load_errors = []
         self.get_vscode_debug_mode()
+
+    def set_data_file_source(self):
+        if self.DBASE in self.EU_DATABASES:
+            self.IMPORT_FOLDER = os.path.join(self.IMPORT_FOLDER, "EU")
+        elif self.DBASE in self.UK_DATABASES:
+            self.IMPORT_FOLDER = os.path.join(self.IMPORT_FOLDER, "CDS")
+        else:
+            print("Please specify a valid database name")
+            sys.exit()
+            
+        a = 1
 
     def num_to_bool(self, num):
         num = int(num)
@@ -68,20 +83,6 @@ class application(object):
             self.quota_definitions = self.get_quota_definitions()
             self.goods_nomenclatures = self.get_all_goods_nomenclatures()
             self.duty_expressions = self.get_duty_expressions()
-
-    def get_config(self):
-        load_dotenv('.env')
-        self.critical_date = os.getenv('CRITICAL_DATE')
-        self.debug = os.getenv('DEBUG')
-        self.password = os.getenv('PASSWORD')
-        self.perform_taric_validation = self.num_to_bool(os.getenv('PERFORM_TARIC_VALIDATION'))
-        self.show_progress = self.num_to_bool(os.getenv('SHOW_PROGRESS'))
-        self.prompt = self.num_to_bool(os.getenv('PROMPT'))
-
-        self.critical_date = datetime.strptime(self.critical_date, '%Y-%m-%d')
-        self.critical_date_plus_one = self.critical_date + timedelta(days=1)
-        self.critical_date_plus_one_string = datetime.strftime(
-            self.critical_date_plus_one, '%Y-%m-%d')
 
     def get_deleted_goods_nomenclatures(self):
         self.deleted_goods_nomenclatures = []
@@ -191,7 +192,7 @@ class application(object):
                         csv_reader = csv.reader(csv_file, delimiter=",")
                         temp = []
                         for row in csv_reader:
-                            c = classification(row[0], row[1], int(
+                            c = Classification(row[0], row[1], int(
                                 row[2]), int(row[3]), int(row[4]))
                             temp.append(c)
                 except:
@@ -724,7 +725,7 @@ class application(object):
             "where (validity_end_date is null or validity_end_date > %s) " \
             "and producline_suffix = '80' order by 1;"
         params = [
-            self.critical_date_plus_one_string
+            datetime.strftime(datetime.now(), '%Y-%m-%d')
         ]
         cur = self.conn.cursor()
         cur.execute(sql, params)
@@ -939,3 +940,43 @@ class application(object):
             self.IMPORT_LOG_DIR, "log_" + import_file)
         self.IMPORT_LOG_FILE = self.IMPORT_LOG_FILE.replace("xml", "txt")
         self.log_handle = open(self.IMPORT_LOG_FILE, "w")
+
+    def create_commodity_extract(self, which="eu"):
+        print("Creating commodity code extract")
+        d = datetime.now()
+        d2 = d.strftime('%Y-%m-%d')
+        self.classifications = []
+        for i in range(0, 10):
+            chapter = str(i) + "%"
+            sql = "select * from utils.goods_nomenclature_export_new('" + chapter + "', '" + d2 + "') order by 2, 3"
+            print("Getting complete commodity code list for codes beginning with " + str(i))
+            d = Database()
+            rows = d.run_query(sql)
+            for row in rows:
+                self.validity_start_date = str(row[0])
+                classification = Classification(
+                    row[0],
+                    row[1],
+                    row[2],
+                    row[3],
+                    row[4],
+                    row[5],
+                    row[6],
+                    row[7],
+                    row[8],
+                    row[9],
+                    row[10]
+                )
+                self.classifications.append(classification)
+
+        filename = os.getcwd()
+        filename = os.path.join(filename, "resources")
+        filename = os.path.join(filename, "csv")
+        filename = os.path.join(filename, which + "_commodities_" + d2 + ".csv")
+
+        f = open(filename, "w+")
+        field_names = '"SID","Commodity code","Product line suffix","Start date","End date","Indentation","End line","Description"\n'
+        f.write(field_names)
+        for item in self.classifications:
+            f.write(item.extract_row())
+        f.close()

@@ -12,7 +12,7 @@ class profile_10005_footnote_type_description(object):
         footnote_type_descriptions = g.app.get_footnote_type_descriptions()
 
         # Set operation types and print load message to screen
-        operation = g.app.get_loading_message(update_type, "footnote type description", footnote_type_id)
+        operation = g.app.get_loading_message(update_type, "footnote type description", footnote_type_id + " (" + description + ")")
 
         # Perform business rule validation
         if g.app.perform_taric_validation is True:

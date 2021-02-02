@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 import xmlschema
-import psycopg2
 import sys
 import os
+
+
 from common.bcolors import bcolors
 from profile.profile_10000_footnote_type import profile_10000_footnote_type
 from profile.profile_10005_footnote_type_description import profile_10005_footnote_type_description
@@ -107,12 +108,13 @@ import common.globals as g
 from common.business_rule_violation import business_rule_violation
 
 
-class taric_file(object):
+class TaricFile(object):
     def __init__(self, import_file):
         self.business_rule_violations = []
         self.import_file = import_file
-        self.import_path_and_file = os.path.join(
-            g.app.IMPORT_DIR, self.import_file)
+        g.app.set_data_file_source()
+        self.import_path_and_file = os.path.join(g.app.IMPORT_FOLDER, self.import_file)
+        a = 1
 
     def import_xml(self):
         self.duty_measure_list = []

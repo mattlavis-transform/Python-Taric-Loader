@@ -46,7 +46,6 @@ By default, all files should be placed in the /import folder relative to the roo
 
 ## Configuration switches
 
-CRITICAL_DATE=yyyy-mm-dd
 DEBUG=0|1
 PASSWORD=xx
 PERFORM_TARIC_VALIDATION=0|1

@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 
 
-class regulation(object):
+class Regulation(object):
     def __init__(self, regulation_id, information_text, reg_type):
         self.regulation_id = regulation_id
         self.information_text = information_text.replace(",", ";")

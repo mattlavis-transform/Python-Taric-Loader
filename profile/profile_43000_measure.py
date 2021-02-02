@@ -1,6 +1,6 @@
 import sys
 import common.globals as g
-from common.classification import classification
+from common.classification import Classification
 from datetime import datetime
 
 

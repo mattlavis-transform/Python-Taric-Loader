@@ -1,7 +1,7 @@
 # Import custom libraries
 import sys
 import common.globals as g
-from common.taric_file import taric_file
+from common.taric_file import TaricFile
 
 # Get database into which to import from 1st argument
 if __name__ == "__main__":
@@ -14,12 +14,11 @@ if __name__ == "__main__":
 
     # Connect to the database
     g.app.DBASE = dbase
-    g.app.get_config()
     g.app.connect()
 
     # Import the files
     for i in range(10, 233):
         file = "TGB20" + str(i).zfill(3) + ".xml"
         print(file)
-        g.data_file = taric_file(file)
+        g.data_file = TaricFile(file)
         g.data_file.import_xml()

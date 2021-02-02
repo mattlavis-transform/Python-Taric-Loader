@@ -14,7 +14,7 @@ class profile_24510_additional_code_description(object):
         description = g.app.get_value(omsg, ".//oub:description", True)
 
         # Set operation types and print load message to screen
-        operation = g.app.get_loading_message(update_type, "additional code type description", additional_code_type_id + additional_code)
+        operation = g.app.get_loading_message(update_type, "additional code description", additional_code_type_id + additional_code + " (" + description + ")")
 
         # Load data
         cur = g.app.conn.cursor()

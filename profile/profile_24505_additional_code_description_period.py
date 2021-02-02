@@ -13,7 +13,7 @@ class profile_24505_additional_code_description_period(object):
         validity_start_date = g.app.get_date_value(omsg, ".//oub:validity.start.date", True)
 
         # Set operation types and print load message to screen
-        operation = g.app.get_loading_message(update_type, "additional code description period", additional_code_description_period_sid)
+        operation = g.app.get_loading_message(update_type, "additional code description period", str(additional_code_description_period_sid) + " (" + str(validity_start_date) + ")")
 
         # Load data
         cur = g.app.conn.cursor()
