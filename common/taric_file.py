@@ -809,6 +809,7 @@ class TaricFile(object):
         cur.execute(sql, params)
         rows = cur.fetchall()
         if len(rows) > 0:
+            g.app.show_progress = True
             g.app.print_to_terminal("File " + self.import_file + " has already been imported - Aborting now\n", False)
             sys.exit()
 

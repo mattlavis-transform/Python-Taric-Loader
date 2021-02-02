@@ -51,8 +51,6 @@ class application(object):
         else:
             print("Please specify a valid database name")
             sys.exit()
-            
-        a = 1
 
     def num_to_bool(self, num):
         num = int(num)
@@ -969,10 +967,7 @@ class application(object):
                 )
                 self.classifications.append(classification)
 
-        filename = os.getcwd()
-        filename = os.path.join(filename, "resources")
-        filename = os.path.join(filename, "csv")
-        filename = os.path.join(filename, which + "_commodities_" + d2 + ".csv")
+        filename = os.path.join(self.CSV_DIR, which + "_commodities_" + d2 + ".csv")
 
         f = open(filename, "w+")
         field_names = '"SID","Commodity code","Product line suffix","Start date","End date","Indentation","End line","Description"\n'
@@ -980,3 +975,11 @@ class application(object):
         for item in self.classifications:
             f.write(item.extract_row())
         f.close()
+
+    def format_date(self, d):
+        if d is None:
+            return ""
+        elif d == "":
+            return ""
+        else:
+            return d[8:10] + "/" + d[5:7] + "/" + d[0:4]
