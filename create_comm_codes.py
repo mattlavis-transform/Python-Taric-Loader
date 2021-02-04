@@ -4,7 +4,7 @@ import common.globals as g
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 0:
+    if len(sys.argv) > 1:
         g.app.DBASE = sys.argv[1]
     else:
         print("Define the database into which to import the Taric XML")
