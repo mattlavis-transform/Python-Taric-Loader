@@ -112,3 +112,4 @@ csv/
 temp/
 .vscode/
 .DS_Store
+/taric/import

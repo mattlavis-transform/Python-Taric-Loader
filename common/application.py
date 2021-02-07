@@ -9,7 +9,7 @@ from datetime import datetime
 from common.log import log
 from common.database import Database
 from common.classification import Classification
-from common.taric_file import TaricFile
+from taric.taric_file import TaricFile
 
 
 class application(object):
@@ -35,6 +35,7 @@ class application(object):
         self.DBASE = None
         self.EU_DATABASES = os.getenv('EU_DATABASES').split(",")
         self.UK_DATABASES = os.getenv('UK_DATABASES').split(",")
+        self.import_type = None
 
         self.namespaces = {'oub': 'urn:publicid:-:DGTAXUD:TARIC:MESSAGE:1.0',
                            'env': 'urn:publicid:-:DGTAXUD:GENERAL:ENVELOPE:1.0', }  # add more as needed
@@ -46,8 +47,10 @@ class application(object):
     def set_data_file_source(self):
         if self.DBASE in self.EU_DATABASES:
             self.IMPORT_FOLDER = os.path.join(self.IMPORT_FOLDER, "EU")
+            self.import_type = "Taric"
         elif self.DBASE in self.UK_DATABASES:
             self.IMPORT_FOLDER = os.path.join(self.IMPORT_FOLDER, "CDS")
+            self.import_type = "CDS"
         else:
             print("Please specify a valid database name")
             sys.exit()
@@ -323,6 +326,7 @@ class application(object):
         f.write(out)
 
     def register_import_complete(self, xml_file):
+        return
         self.import_complete_time = self.get_timestamp()
         sql = """UPDATE utils.import_files SET import_completed = %s,
         status = 'Completed' WHERE import_file = %s"""

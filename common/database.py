@@ -45,7 +45,10 @@ class Database:
                     cur.close()
                     return records
                 else:
-                    result = cur.execute(query)
+                    if params is None:
+                        result = cur.execute(query)
+                    else:
+                        result = cur.execute(query, params)
                     self.conn.commit()
                     affected = f"{cur.rowcount} rows affected."
                     cur.close()

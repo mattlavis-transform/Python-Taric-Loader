@@ -1,7 +1,7 @@
 # Import custom libraries
 import sys
 import common.globals as g
-from common.taric_file import TaricFile
+from taric.taric_file import TaricFile
 
 # Get database into which to import from 1st argument
 if __name__ == "__main__":
