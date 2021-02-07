@@ -11,6 +11,7 @@ from cds.models.certificate_type import CertificateType
 from cds.models.additional_code_type import AdditionalCodeType
 from cds.models.measure_type import MeasureType
 from cds.models.footnote import Footnote
+from cds.models.certificate import Certificate
 from cds.models.additional_code import AdditionalCode
 
 
@@ -24,9 +25,6 @@ class CdsFile(object):
     def initialise_variables(self):
         self.base_regulations = []
         self.measures = []
-        self.footnotes = []
-        self.certificates = []
-        self.additional_codes = []
         self.goods_nomenclatures = []
         self.quota_order_numbers = []
         self.quota_definitions = []
@@ -74,6 +72,10 @@ class CdsFile(object):
         # Get footnotes
         for elem in root_node.findall('.//findFootnoteByDatesResponse/Footnote'):
             Footnote(elem, self.import_file)
+
+        # Get certificates
+        for elem in root_node.findall('.//findCertificateByDatesResponse/Certificate'):
+            Certificate(elem, self.import_file)
 
         # Get additional codes
         for elem in root_node.findall('.//findAdditionalCodeByDatesResponse/AdditionalCode'):
