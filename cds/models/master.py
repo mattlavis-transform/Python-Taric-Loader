@@ -25,6 +25,11 @@ class Master(object):
             return None
         else:
             s = elem.text
-            s = s.replace("T00:00:00", "")
+            # Starts as text in format 2018-12-15T04:11:14
+            # Needs to get converted into a date with the time removed
+            pos = s.find("T")
+            if pos > 0:
+                s = s[0:pos]
+            # s = s.replace("T00:00:00", "")
             d = datetime.strptime(s, "%Y-%m-%d")
             return d

@@ -7,6 +7,7 @@ from common.bcolors import bcolors
 import common.globals as g
 
 from cds.models.footnote_type import FootnoteType
+from cds.models.additional_code_type import AdditionalCodeType
 from cds.models.footnote import Footnote
 from cds.models.additional_code import AdditionalCode
 
@@ -55,6 +56,10 @@ class CdsFile(object):
         # Get footnote types
         for elem in root_node.findall('.//findFootnoteTypeByDatesResponse/FootnoteType'):
             FootnoteType(elem, self.import_file)
+
+        # Get additional code types
+        for elem in root_node.findall('.//findAdditionalCodeTypeByDatesResponse/AdditionalCodeType'):
+            AdditionalCodeType(elem, self.import_file)
 
         # Get footnotes
         for elem in root_node.findall('.//findFootnoteByDatesResponse/Footnote'):
