@@ -13,6 +13,8 @@ from cds.models.measure_type import MeasureType
 from cds.models.footnote import Footnote
 from cds.models.certificate import Certificate
 from cds.models.additional_code import AdditionalCode
+from cds.models.geographical_area import GeographicalArea
+from cds.models.base_regulation import BaseRegulation
 
 
 class CdsFile(object):
@@ -80,6 +82,14 @@ class CdsFile(object):
         # Get additional codes
         for elem in root_node.findall('.//findAdditionalCodeByDatesResponse/AdditionalCode'):
             AdditionalCode(elem, self.import_file)
+
+        # Get geographical areas
+        for elem in root_node.findall('.//findGeographicalAreaByDatesResponse/GeographicalArea'):
+            GeographicalArea(elem, self.import_file)
+
+        # Get base regulations
+        for elem in root_node.findall('.//findBaseRegulationByDatesResponseHistory/BaseRegulation'):
+            BaseRegulation(elem, self.import_file)
 
         # Register the load
         g.app.register_import_complete(self.import_file)
