@@ -9,6 +9,7 @@ import common.globals as g
 from cds.models.footnote_type import FootnoteType
 from cds.models.certificate_type import CertificateType
 from cds.models.additional_code_type import AdditionalCodeType
+from cds.models.measure_type import MeasureType
 from cds.models.footnote import Footnote
 from cds.models.additional_code import AdditionalCode
 
@@ -65,6 +66,10 @@ class CdsFile(object):
         # Get additional code types
         for elem in root_node.findall('.//findAdditionalCodeTypeByDatesResponse/AdditionalCodeType'):
             AdditionalCodeType(elem, self.import_file)
+
+        # Get measure types
+        for elem in root_node.findall('.//findMeasureTypeByDatesResponse/MeasureType'):
+            MeasureType(elem, self.import_file)
 
         # Get footnotes
         for elem in root_node.findall('.//findFootnoteByDatesResponse/Footnote'):
