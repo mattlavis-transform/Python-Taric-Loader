@@ -10,7 +10,6 @@ from cds.models.additional_code_type_measure_type import AdditionalCodeTypeMeasu
 class AdditionalCodeType(Master):
     def __init__(self, elem, import_file):
         Master.__init__(self, elem)
-        self.descriptions = []
         self.additional_code_type_id = Master.process_null(elem.find("additionalCodeTypeId"))
         self.validity_start_date = Master.process_date(elem.find("validityStartDate"))
         self.validity_end_date = Master.process_date(elem.find("validityEndDate"))

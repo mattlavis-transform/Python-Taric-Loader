@@ -9,7 +9,6 @@ from cds.models.footnote_type_description import FootnoteTypeDescription
 class FootnoteType(Master):
     def __init__(self, elem, import_file):
         Master.__init__(self, elem)
-        self.descriptions = []
         self.footnote_type_id = Master.process_null(elem.find("footnoteTypeId"))
         self.validity_start_date = Master.process_date(elem.find("validityStartDate"))
         self.validity_end_date = Master.process_date(elem.find("validityEndDate"))
