@@ -37,6 +37,6 @@ class FootnoteDescriptionPeriod(Master):
         d = Database()
         d.run_query(sql, params)
 
-        # Create new foonote descriptions
+        # Create new footnote descriptions
         for elem in elem.findall('.//footnoteDescription'):
             FootnoteDescription(elem, self.footnote_description_period_sid, self.footnote_type_id, self.footnote_id, import_file)

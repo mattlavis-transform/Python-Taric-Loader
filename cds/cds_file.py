@@ -5,7 +5,10 @@ import os
 from common.database import Database
 from common.bcolors import bcolors
 import common.globals as g
+
+from cds.models.footnote_type import FootnoteType
 from cds.models.footnote import Footnote
+from cds.models.additional_code import AdditionalCode
 
 
 class CdsFile(object):
@@ -49,9 +52,17 @@ class CdsFile(object):
         if 1 > 2:
             self.register_import_start(self.import_file)
 
+        # Get footnote types
+        for elem in root_node.findall('.//findFootnoteTypeByDatesResponse/FootnoteType'):
+            FootnoteType(elem, self.import_file)
+
         # Get footnotes
         for elem in root_node.findall('.//findFootnoteByDatesResponse/Footnote'):
             Footnote(elem, self.import_file)
+
+        # Get additional codes
+        for elem in root_node.findall('.//findAdditionalCodeByDatesResponse/AdditionalCode'):
+            AdditionalCode(elem, self.import_file)
 
         # Register the load
         g.app.register_import_complete(self.import_file)

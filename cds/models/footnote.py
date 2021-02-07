@@ -36,7 +36,7 @@ class Footnote(Master):
         d = Database()
         d.run_query(sql, params)
 
-        # Delete any foonote descriptions
+        # Delete any footnote descriptions
         sql = """
         delete from footnote_descriptions_oplog
         where footnote_type_id = %s and footnote_id = %s
@@ -45,7 +45,7 @@ class Footnote(Master):
         d = Database()
         d.run_query(sql, params)
 
-        # Delete any foonote description periods
+        # Delete any footnote description periods
         sql = """
         delete from footnote_description_periods_oplog
         where footnote_type_id = %s and footnote_id = %s
@@ -54,6 +54,6 @@ class Footnote(Master):
         d = Database()
         d.run_query(sql, params)
 
-        # Ceate new foontote description periods
+        # Create new footnote description periods
         for elem in elem.findall('.//footnoteDescriptionPeriod'):
             FootnoteDescriptionPeriod(elem, self.footnote_type_id, self.footnote_id, import_file)
