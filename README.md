@@ -33,9 +33,17 @@
 
   e.g. via `psql -U postgres -d tariff_empty -a -f db/structure.sql`
 
-## Usage
+## Usage 1 - Imports full and incremental Taric XML files into EU / XI databases
 
-Imports full and incremental Taric XML files.
+Python 3 application which runs on command line using two parameters:
+
+- Parameter 1 = name of PostgreSQL database into which to import the data
+- Parameter 2 = name of the incremental Taric 3 file to import into the database
+
+By default, all files should be placed in the /import folder relative to the root directory
+
+
+## Usage 2 - Imports full and incremental CDS incremental XMS files into UK databases
 
 Python 3 application which runs on command line using two parameters:
 
