@@ -16,7 +16,7 @@ from cds.models.additional_code import AdditionalCode
 from cds.models.geographical_area import GeographicalArea
 from cds.models.base_regulation import BaseRegulation
 from cds.models.quota_order_number import QuotaOrderNumber
-from cds.models.quota_order_number import QuotaOrderNumber
+from cds.models.quota_definition import QuotaDefinition
 
 
 class CdsFile(object):
