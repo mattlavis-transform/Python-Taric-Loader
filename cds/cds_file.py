@@ -96,13 +96,10 @@ class CdsFile(object):
         # Get quota order numbers
         for elem in root_node.findall('.//findQuotaOrderNumberByDatesResponseHistory/QuotaOrderNumber'):
             QuotaOrderNumber(elem, self.import_file)
-            
+
         # Get quota order definitions
         for elem in root_node.findall('.//findQuotaDefinitionByDatesResponseHistory/QuotaDefinition'):
             QuotaDefinition(elem, self.import_file)
-            
-            
-            
 
         # Register the load
         g.app.register_import_complete(self.import_file)

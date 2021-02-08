@@ -9,7 +9,6 @@ from cds.models.quota_order_number_origin import QuotaOrderNumberOrigin
 class QuotaOrderNumber(Master):
     def __init__(self, elem, import_file):
         Master.__init__(self, elem)
-        self.descriptions = []
         self.quota_order_number_sid = Master.process_null(elem.find("sid"))
         self.quota_order_number_id = Master.process_null(elem.find("quotaOrderNumberId"))
         self.validity_start_date = Master.process_date(elem.find("validityStartDate"))
