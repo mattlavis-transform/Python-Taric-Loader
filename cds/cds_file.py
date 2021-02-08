@@ -15,6 +15,8 @@ from cds.models.certificate import Certificate
 from cds.models.additional_code import AdditionalCode
 from cds.models.geographical_area import GeographicalArea
 from cds.models.base_regulation import BaseRegulation
+from cds.models.quota_order_number import QuotaOrderNumber
+from cds.models.quota_order_number import QuotaOrderNumber
 
 
 class CdsFile(object):
@@ -90,6 +92,17 @@ class CdsFile(object):
         # Get base regulations
         for elem in root_node.findall('.//findBaseRegulationByDatesResponseHistory/BaseRegulation'):
             BaseRegulation(elem, self.import_file)
+
+        # Get quota order numbers
+        for elem in root_node.findall('.//findQuotaOrderNumberByDatesResponseHistory/QuotaOrderNumber'):
+            QuotaOrderNumber(elem, self.import_file)
+            
+        # Get quota order definitions
+        for elem in root_node.findall('.//findQuotaDefinitionByDatesResponseHistory/QuotaDefinition'):
+            QuotaDefinition(elem, self.import_file)
+            
+            
+            
 
         # Register the load
         g.app.register_import_complete(self.import_file)
