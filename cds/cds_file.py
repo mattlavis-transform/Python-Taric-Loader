@@ -17,6 +17,7 @@ from cds.models.geographical_area import GeographicalArea
 from cds.models.base_regulation import BaseRegulation
 from cds.models.quota_order_number import QuotaOrderNumber
 from cds.models.quota_definition import QuotaDefinition
+from cds.models.goods_nomenclature import GoodsNomenclature
 
 
 class CdsFile(object):
@@ -100,6 +101,10 @@ class CdsFile(object):
         # Get quota order definitions
         for elem in root_node.findall('.//findQuotaDefinitionByDatesResponseHistory/QuotaDefinition'):
             QuotaDefinition(elem, self.import_file)
+
+        # Get quota order definitions
+        for elem in root_node.findall('.//findGoodsNomenclatureByDatesResponse/GoodsNomenclature'):
+            GoodsNomenclature(elem, self.import_file)
 
         # Register the load
         g.app.register_import_complete(self.import_file)

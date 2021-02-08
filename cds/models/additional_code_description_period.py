@@ -13,8 +13,8 @@ class AdditionalCodeDescriptionPeriod(Master):
         self.additional_code_type_id = additional_code_type_id
         self.additional_code = additional_code
         self.additional_code_description_period_sid = Master.process_null(elem.find("sid"))
-        self.validity_start_date = Master.process_null(elem.find("validityStartDate"))
-        self.validity_end_date = Master.process_null(elem.find("validityEndDate"))
+        self.validity_start_date = Master.process_date(elem.find("validityStartDate"))
+        self.validity_end_date = Master.process_date(elem.find("validityEndDate"))
         operation_date = g.app.get_timestamp()
 
         # Insert the additional code description period

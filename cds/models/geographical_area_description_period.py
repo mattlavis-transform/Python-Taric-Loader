@@ -12,8 +12,8 @@ class GeographicalAreaDescriptionPeriod(Master):
         self.geographical_area_sid = geographical_area_sid
         self.geographical_area_id = geographical_area_id
         self.geographical_area_description_period_sid = Master.process_null(elem.find("sid"))
-        self.validity_start_date = Master.process_null(elem.find("validityStartDate"))
-        self.validity_end_date = Master.process_null(elem.find("validityEndDate"))
+        self.validity_start_date = Master.process_date(elem.find("validityStartDate"))
+        self.validity_end_date = Master.process_date(elem.find("validityEndDate"))
         operation_date = g.app.get_timestamp()
 
         # Insert the geographical area description period
