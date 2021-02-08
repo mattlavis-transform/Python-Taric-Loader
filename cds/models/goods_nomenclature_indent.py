@@ -16,7 +16,7 @@ class GoodsNomenclatureIndent(Master):
         self.number_indents = Master.process_null(elem.find("numberIndents"))
         self.validity_start_date = Master.process_date(elem.find("validityStartDate"))
         self.validity_end_date = Master.process_date(elem.find("validityEndDate"))
-        
+
         operation_date = g.app.get_timestamp()
 
         # Insert the footnote description period
