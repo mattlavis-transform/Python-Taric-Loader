@@ -40,8 +40,6 @@ Python 3 application which runs on command line using two parameters:
 - Parameter 1 = name of PostgreSQL database into which to import the data
 - Parameter 2 = name of the incremental Taric 3 file to import into the database
 
-By default, all files should be placed in the /import folder relative to the root directory
-
 - e.g. `python3 import.py tariff_xi_production TGB21027.xml`
 
 
@@ -52,7 +50,8 @@ Python 3 application which runs on command line using two parameters:
 - Parameter 1 = name of PostgreSQL database into which to import the data
 - Parameter 2 = name of the incremental Taric 3 file to import into the database
 
-By default, all files should be placed in the /import folder relative to the root directory
+- e.g. `python3 import.py tariff_uk_production export-20210206T000000_20210206T235959-20210207T200018.xml`
+
 
 ## Configuration switches
 
