@@ -56,8 +56,7 @@ class CdsFile(object):
             sys.exit(0)
         root_node = tree.getroot()
 
-        if 1 > 2:
-            self.register_import_start(self.import_file)
+        self.register_import_start(self.import_file)
 
         # Get footnote types
         for elem in root_node.findall('.//findFootnoteTypeByDatesResponse/FootnoteType'):

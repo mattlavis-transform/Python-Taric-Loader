@@ -48,9 +48,11 @@ class application(object):
         if self.DBASE in self.EU_DATABASES:
             self.IMPORT_FOLDER = os.path.join(self.IMPORT_FOLDER, "EU")
             self.import_type = "Taric"
+
         elif self.DBASE in self.UK_DATABASES:
             self.IMPORT_FOLDER = os.path.join(self.IMPORT_FOLDER, "CDS")
             self.import_type = "CDS"
+
         else:
             print("Please specify a valid database name")
             sys.exit()

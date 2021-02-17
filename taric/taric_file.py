@@ -112,7 +112,7 @@ class TaricFile(object):
     def __init__(self, import_file):
         self.business_rule_violations = []
         self.import_file = import_file
-        g.app.set_data_file_source()
+        # g.app.set_data_file_source()
         self.import_path_and_file = os.path.join(g.app.IMPORT_FOLDER, self.import_file)
         a = 1
 

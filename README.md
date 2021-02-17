@@ -42,6 +42,8 @@ Python 3 application which runs on command line using two parameters:
 
 By default, all files should be placed in the /import folder relative to the root directory
 
+- e.g. `python3 import.py tariff_xi_production TGB21027.xml`
+
 
 ## Usage 2 - Imports full and incremental CDS incremental XMS files into UK databases
 
