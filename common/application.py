@@ -181,6 +181,10 @@ class application(object):
         if self.show_progress is True:
             print(s)
 
+    def print_only(self, s):
+        if self.show_progress is True:
+            print(s)
+
     def load_classification_trees(self):
         if self.perform_taric_validation is True:
             self.nodes = []

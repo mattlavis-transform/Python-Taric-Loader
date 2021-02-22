@@ -52,7 +52,6 @@ Python 3 application which runs on command line using two parameters:
 
 - e.g. `python3 import.py tariff_uk_production export-20210206T000000_20210206T235959-20210207T200018.xml`
 
-
 ## Configuration switches
 
 DEBUG=0|1
@@ -61,3 +60,4 @@ PERFORM_TARIC_VALIDATION=0|1
 SHOW_PROGRESS=0|1
 PROMPT=0|1
 
+python3 transform.py tariff_uk_production export-20210201T000000_20210201T235959-20210202T200020.xml
