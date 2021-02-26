@@ -23,11 +23,36 @@ from cds.models.measure import Measure
 
 class CdsFile(object):
     def __init__(self, import_file):
+        if import_file == "next":
+            self.latest_file = self.latest()
+            path = os.walk(g.app.IMPORT_FOLDER)
+            file_array = []
+            for root, directories, files in path:
+                for file in files:
+                    file_array.append(file)
+            file_array.sort(reverse=False)
+            for file in file_array:
+                if ".xml" in file:
+                    if file > self.latest_file:
+                        import_file = file
+                        break
+
         self.business_rule_violations = []
         self.import_file = import_file
         self.import_path_and_file = os.path.join(
             g.app.IMPORT_FOLDER, self.import_file)
         self.initialise_variables()
+
+    def latest(self, silent=True):
+        sql = "SELECT import_file FROM utils.import_files order by 1 desc limit 1"
+        d = Database()
+        rows = d.run_query(sql)
+        if len(rows) > 0:
+            if silent is False:
+                print("The last file to have been imported is", rows[0][0])
+            return rows[0][0]
+        else:
+            return ""
 
     def initialise_variables(self):
         self.base_regulations = []
@@ -137,7 +162,7 @@ class CdsFile(object):
             sys.exit(0)
         root_node = tree.getroot()
 
-        //self.register_import_start(self.import_file)
+        self.register_import_start(self.import_file)
 
         # Get footnote types
         for elem in root_node.findall('.//findFootnoteTypeByDatesResponse/FootnoteType'):

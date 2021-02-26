@@ -23,6 +23,7 @@
   - sh==1.14.1
   - six==1.15.0
   - toml==0.10.2
+  - xlrd==1.2.0
   - xmlschema==1.3.1
 
   via `pip3 install -r requirements.txt`
@@ -60,4 +61,4 @@ PERFORM_TARIC_VALIDATION=0|1
 SHOW_PROGRESS=0|1
 PROMPT=0|1
 
-python3 transform.py tariff_uk_production export-20210201T000000_20210201T235959-20210202T200020.xml
+python3 transform.py   tariff_uk_production   export-20210222T000000_20210222T235959-20210223T200034.xml

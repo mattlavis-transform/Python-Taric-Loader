@@ -1,3 +1,4 @@
+from common.database import Database
 import xml.etree.ElementTree as ET
 import xmlschema
 import sys
@@ -110,11 +111,33 @@ from taric.business_rule_violation import business_rule_violation
 
 class TaricFile(object):
     def __init__(self, import_file):
+        if import_file == "next":
+            self.latest_file = self.latest()
+            path = os.walk(g.app.IMPORT_FOLDER)
+            file_array = []
+            for root, directories, files in path:
+                for file in files:
+                    file_array.append(file)
+            file_array.sort(reverse=False)
+            for file in file_array:
+                if file > self.latest_file:
+                    import_file = file
+                    break
+
         self.business_rule_violations = []
         self.import_file = import_file
-        # g.app.set_data_file_source()
         self.import_path_and_file = os.path.join(g.app.IMPORT_FOLDER, self.import_file)
-        a = 1
+
+    def latest(self, silent=True):
+        sql = "SELECT import_file FROM utils.import_files order by 1 desc limit 1"
+        d = Database()
+        rows = d.run_query(sql)
+        if len(rows) > 0:
+            if silent is False:
+                print("The last file to have been imported is", rows[0][0])
+            return rows[0][0]
+        else:
+            return ""
 
     def import_xml(self):
         self.duty_measure_list = []
