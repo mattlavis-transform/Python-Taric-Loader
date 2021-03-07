@@ -332,7 +332,7 @@ class application(object):
         f.write(out)
 
     def register_import_complete(self, xml_file):
-        return
+        # return
         self.import_complete_time = self.get_timestamp()
         sql = """UPDATE utils.import_files SET import_completed = %s,
         status = 'Completed' WHERE import_file = %s"""
@@ -340,9 +340,8 @@ class application(object):
             self.import_complete_time,
             xml_file
         ]
-        cur = self.conn.cursor()
-        cur.execute(sql, params)
-        self.conn.commit()
+        d = Database()
+        d.run_query(sql, params)
 
     def larger(self, a, b):
         try:
