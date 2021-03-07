@@ -3,7 +3,7 @@ import common.globals as g
 from common.database import Database
 
 if len(sys.argv) > 1:
-    g.app.DBASE = sys.argv[1]
+    g.app.DBASE = sys.argv[1].lower()
     if g.app.DBASE == "xi":
         g.app.DBASE = "tariff_xi_production"
     elif g.app.DBASE == "uk":

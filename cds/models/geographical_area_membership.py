@@ -42,15 +42,15 @@ class GeographicalAreaMembership(Master):
             d = Database()
             d.run_query(sql, params)
 
-        def lookup_child_hjid(self):
-            sql = """
-            select geographical_area_sid from geographical_areas_oplog where hjid = %s
-            """
-            params = [
-                self.child_hjid
-            ]
-            d = Database()
-            rows = d.run_query(sql, params)
-            if len(rows) > 0:
-                row = rows[0]
-                self.geographical_area_sid = row[0]
+    def lookup_child_hjid(self):
+        sql = """
+        select geographical_area_sid from geographical_areas_oplog where hjid = %s
+        """
+        params = [
+            self.child_hjid
+        ]
+        d = Database()
+        rows = d.run_query(sql, params)
+        if len(rows) > 0:
+            row = rows[0]
+            self.geographical_area_sid = row[0]
