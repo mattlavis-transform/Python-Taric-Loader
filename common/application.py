@@ -10,6 +10,7 @@ from common.log import log
 from common.database import Database
 from common.classification import Classification
 from taric.taric_file import TaricFile
+from cds.delta import Delta
 
 
 class application(object):
@@ -65,6 +66,8 @@ class application(object):
             return True
 
     def connect(self):
+        if self.DBASE == "uk":
+            self.DBASE = "tariff_uk_production"
         try:
             self.conn = psycopg2.connect(
                 "dbname=" + self.DBASE + " user=postgres password=" + self.password)
@@ -992,3 +995,7 @@ class application(object):
             return ""
         else:
             return d[8:10] + "/" + d[5:7] + "/" + d[0:4]
+
+    def create_delta(self):
+        delta = Delta()
+        pass

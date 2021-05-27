@@ -5,7 +5,7 @@
 The current changes implementation is quite poor.
 
 - it relies on every change being captured on a daily basis
-- not al changes are actually captured
+- not all changes are actually captured
 - you still have to go to every commodity code anyway
 
 ## What we need to capture and in what circumstances
