@@ -6,7 +6,7 @@ MonthDelta==0.9.1
 numpy==1.19.4
 openpyxl==3.0.5
 pandas==1.1.4
-psycopg2==2.8.6
+psycopg2-binary==2.8.6
 pycodestyle==2.6.0
 python-dateutil==2.8.1
 python-dotenv==0.15.0
