@@ -17,8 +17,10 @@ if __name__ == "__main__":
                 g.app.change_period = sys.argv[3].lower()
             else:
                 print("\nDefine the change period\n")
+                sys.exit()
         else:
             print("\nDefine the change date\n")
+            sys.exit()
     else:
         print("\nDefine the database into which to import the Taric XML\n")
         sys.exit()
